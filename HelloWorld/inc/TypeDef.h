@@ -36,21 +36,13 @@ typedef double               JDOUBLE;
 /// void
 typedef void                 JVOID;
 
-#if defined(_MSC_VER)
 /// int
 typedef int              		 JINT;
 
 /// int
 typedef unsigned int      	 JUINT;
-#else ///< _MSC_VER
-/// int
-typedef int32_t              JINT;
 
-/// int
-typedef uint32_t       			 JUINT;
-#endif ///< _MSC_VER
-
-typedef unsigned long  			COLORREF;
+typedef unsigned long  				COLORREF;
 
 typedef struct JTMSt
 {
