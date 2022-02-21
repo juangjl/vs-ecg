@@ -42,7 +42,7 @@ typedef int              		 JINT;
 /// int
 typedef unsigned int      	 JUINT;
 
-typedef unsigned long  				COLORREF;
+typedef unsigned long  			 COLORREF;
 
 typedef struct JTMSt
 {

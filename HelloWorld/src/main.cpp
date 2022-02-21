@@ -40,6 +40,6 @@ JINT main(int argc, char *argv[])
 ///------------------------------------------///
 void Mainloop()
 {
-	DBG_PRINTF("Hello World\r\n");
+	DBG_PRINTF("\r\n Hello World \r\n");
 }
 
