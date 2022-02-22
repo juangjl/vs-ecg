@@ -52,7 +52,7 @@ JBOOL SerialPortOpenEx(DevSPType *pDevSP)
     ///---------------------------------------------------------///    
     /// Could not open the port.
     ///---------------------------------------------------------///
-    printf("[ERROR] open_port: Unable to open '%s''\r\n", pDevSP->strName);
+    printf("[ERROR] open_port: Unable to open '%s'\r\n", pDevSP->strName);
     return FALSE;
   }
   else
@@ -119,6 +119,14 @@ JBOOL SerialPortSetupPrint(DevSPType *pDevSP)
     printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
     return FALSE;
   }
+
+  printf("\r\n");
+  printf("-----------------------------------------\r\n");
+  printf("\t CFLAG  = %08X\r\n",  (JDWORD)tty.c_cflag);
+  printf("\t LFLAG  = %08X\r\n",  (JDWORD)tty.c_lflag);  
+  printf("\t ISPEED = %08X\r\n",  (JDWORD)tty.c_ispeed);    
+  printf("\t OSPEED = %08X\r\n",  (JDWORD)tty.c_ospeed);      
+  printf("-----------------------------------------\r\n"
 
   return TRUE;
 }
