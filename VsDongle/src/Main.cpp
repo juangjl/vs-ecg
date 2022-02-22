@@ -14,10 +14,6 @@
 #include "Global.h"
 void Mainloop(void);
 
-
-//#define SERIAL_PORT  "/dev/cu.usbserial-113430"
-#define SERIAL_PORT  "/dev/cu.usbserial-113430"
-
 GlobalVarType GlobalVar;
 
 void VarInit(void)
@@ -54,14 +50,27 @@ void Mainloop()
 	JBOOL bRet = FALSE;
 	
 	///-----------------------------------------------------------------------------///
-	/// 1. Serial Port Set
+	/// 1. Config Load
 	///-----------------------------------------------------------------------------///
-	sprintf(strSerialPort, "%s", SERIAL_PORT);
+	ConfigLoad();
 
 	///-----------------------------------------------------------------------------///
-	/// 2. Serial Port Open
+	/// 2. VsDongle name set
+	/// 		# for macOS
+	/// 		$ ls /dev/cu.usbserial*
+	///
+	/// 		# for ubuntu
+	/// 		$ ls /dev/ttyUSB*
+	///
 	///-----------------------------------------------------------------------------///
-	bRet = FuncSerialPortOpen(strSerialPort);
+	ConfigStrGet((char *)CONFIG_ITEM_SERIAL_PORT, strSerialPort);
+	sprintf(msg, "VSDongle : %s\r\n", strSerialPort);
+	DBG_PRINTF(msg);
+
+	///-----------------------------------------------------------------------------///
+	/// 3. VsDongle Open
+	///-----------------------------------------------------------------------------///
+	bRet = FuncVSDongleOpen(strSerialPort);
 	if(bRet == FALSE)
 	{
 		sprintf(msg, "[ERROR] Failed to open the serial port: %s\r\n", strSerialPort);
@@ -70,34 +79,38 @@ void Mainloop()
 	}
 
 	///-----------------------------------------------------------------------------///
-	/// 3. Version Get
+	/// 4. Version Get
 	///-----------------------------------------------------------------------------///
-	bRet = FuncVsDongleVersionGet();
+	bRet = FuncVSDongleVersionGet();
 	if(bRet == FALSE)
 	{
-		sprintf(msg, "%s", "[ERROR] Failed to get VsDongle version\r\n");
+		sprintf(msg, "%s", "[ERROR] Failed to get VS Dongle version\r\n");
 		DBG_PRINTF(msg);
 		return;
 	}
 
 	///-----------------------------------------------------------------------------///
-	/// 4. Time Set
+	/// 5. Time Set
 	///-----------------------------------------------------------------------------///
-	bRet = FuncVsDongleTimeSet();
+	bRet = FuncVSDongleTimeSet();
 	if(bRet == FALSE)
 	{
-		sprintf(msg, "%s", "[ERROR] Failed to set VsDongle Time\r\n");
+		sprintf(msg, "%s", "[ERROR] Failed to set VS Dongle Time\r\n");
 		DBG_PRINTF(msg);
 		return;
 	}
 
 	///-----------------------------------------------------------------------------///
-	/// 5. Serial Port Close
+	/// 6. VsDongle Close
 	///-----------------------------------------------------------------------------///
-	bRet = FuncSerialPortClose();
+	bRet = FuncVSDongleClose();
 
-	sprintf(msg, "%s", "byebye\r\n");
-	DBG_PRINTF(msg);
+	///-----------------------------------------------------------------------------///
+	/// 7. Config Save
+	///-----------------------------------------------------------------------------///
+	ConfigSave();
+
+	printf("\r\nbyebye\r\n");
 	return;
 }
 

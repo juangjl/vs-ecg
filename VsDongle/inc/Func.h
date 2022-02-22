@@ -11,11 +11,11 @@
 #ifndef __FUNC_H__
 #define __FUNC_H__
 
-extern JBOOL FuncSerialPortOpen(char *strPortName);
-extern JBOOL FuncSerialPortClose(void);
+extern JBOOL FuncVSDongleOpen(char *strPortName);
+extern JBOOL FuncVSDongleClose(void);
 
 
-extern JBOOL FuncVsDongleVersionGet(void);
-extern JBOOL FuncVsDongleTimeSet(void);
+extern JBOOL FuncVSDongleVersionGet(void);
+extern JBOOL FuncVSDongleTimeSet(void);
 
 #endif ///< for __FUNC_H__

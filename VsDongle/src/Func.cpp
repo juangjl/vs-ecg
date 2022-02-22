@@ -9,7 +9,7 @@
  */
 #include "Global.h"
 
-JBOOL FuncSerialPortOpen(char *strPortName)
+JBOOL FuncVSDongleOpen(char *strPortName)
 {
 	JBOOL bSerialOpen = FALSE;
 
@@ -27,7 +27,7 @@ JBOOL FuncSerialPortOpen(char *strPortName)
 	return TRUE;
 }
 
-JBOOL FuncSerialPortClose(void)
+JBOOL FuncVSDongleClose(void)
 {
 	JINT iErrNo = NO_ERR;
 	JBOOL bRet = TRUE;
@@ -39,7 +39,7 @@ JBOOL FuncSerialPortClose(void)
 	return bRet;
 }
 
-JBOOL FuncVsDongleVersionGet(void)
+JBOOL FuncVSDongleVersionGet(void)
 {
 	JINT iErrNo = NO_ERR;
 	
@@ -52,7 +52,7 @@ JBOOL FuncVsDongleVersionGet(void)
 	return TRUE;
 }
 
-JBOOL FuncVsDongleTimeSet(void)
+JBOOL FuncVSDongleTimeSet(void)
 {
 	JINT iErrNo = NO_ERR;
 	time_t t = time(NULL);
