@@ -126,7 +126,7 @@ JBOOL SerialPortSetupPrint(DevSPType *pDevSP)
   printf("\t LFLAG  = %08X\r\n",  (JDWORD)tty.c_lflag);  
   printf("\t ISPEED = %08X\r\n",  (JDWORD)tty.c_ispeed);    
   printf("\t OSPEED = %08X\r\n",  (JDWORD)tty.c_ospeed);      
-  printf("-----------------------------------------\r\n"
+  printf("-----------------------------------------\r\n");
 
   return TRUE;
 }
