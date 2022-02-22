@@ -12,13 +12,17 @@ LL=g++
 SRC=./src
 OUT=./out
 
+OS_NAME := $(shell uname -s)
+
 CFLAGS= -O3 -ansi -g -Wno-unused-result -DARCH=$(shell uname)    
 
 LFLAGS= -lpthread -lz -lm
 
-INC=  -I./inc 
+ifeq ($(OS_NAME), Linux)
+        CFLAGS+=  -Wno-format-overflow
+endif
 
-OS_NAME := $(shell uname -s)
+INC=  -I./inc 
 
 C_SRC    := $(wildcard $(SRC)/*.c)
 C_OBJS   := $(C_SRC:%.c=%.o)
@@ -39,9 +43,6 @@ $(CPP_OBJS): $(OBJ)%.o :%.cpp
 	@echo "[CC] "$<
 
 $(C_OBJS): $(OBJ)%.o : %.c
-	ifeq ($(UNAME_S),Linux)
-		CCFLAGS += -Wno-format-overflow 
-	endif
 	@$(CC)  $(CFLAGS) $(CFLAG_GTK) -c $<  -o $@ ${INC} -Wno-deprecated
 	@echo "[CC] "$<	
 
