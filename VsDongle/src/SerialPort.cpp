@@ -76,7 +76,7 @@ JBOOL SerialPortSetup(DevSPType *pDevSP)
     printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
     return FALSE;
   }
-
+  tty.c_cflag = 0;
   /// 8-bit
   tty.c_cflag |= CS8; // 8 bits per byte (most common)
   /// no parity bit
@@ -89,13 +89,19 @@ JBOOL SerialPortSetup(DevSPType *pDevSP)
   tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
   
   tty.c_cflag |= CREAD | CLOCAL;
-
+  
+  tty.c_lflag = 0;
   tty.c_lflag &= ~ICANON;
+  tty.c_lflag &= ~ECHOK; 
   tty.c_lflag &= ~ECHO;   ///< Disable echo
   tty.c_lflag &= ~ECHOE;  ///< Disable erasure
   tty.c_lflag &= ~ECHONL; ///< Disable new-line echo
+  tty.c_lflag &= ~ECHOCTL; ///< Disable new-line echo
 
   tty.c_lflag &= ~ISIG; 
+  
+  tty.c_oflag &=~(ONLCR|OCRNL);
+  tty.c_iflag &=~(IXON|IXOFF|IXANY|ICRNL|INLCR|IGNCR);
 
   cfsetispeed(&tty, B921600);
   cfsetospeed(&tty, B921600);
@@ -322,7 +328,7 @@ JBOOL SerialPortOpen(void)
   SerialPortBlockSet(pDevSP,  FALSE);  
   SerialPortFlush(pDevSP);
   SerialPortSetup(pDevSP);  
-  SerialPortSetupPrint(pDevSP);
+  //SerialPortSetupPrint(pDevSP);
   return TRUE;
 }
 
