@@ -307,7 +307,7 @@ JBOOL SerialPortOpen(void)
   bRet = SerialPortOpenEx(pDevSP);
   if(bRet == FALSE)
 	{
-		sprintf(msg, "Serial port %s open --> failed", pDevSP->strName);
+		sprintf(msg, "Serial port %s open --> failed\r\n", pDevSP->strName);
 		DBG_PRINTF(msg);  
 		return FALSE;
 	}
