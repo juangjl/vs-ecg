@@ -14,10 +14,11 @@ OUT=./out
 
 CFLAGS= -O3 -ansi -g -Wno-unused-result -DARCH=$(shell uname)    
 
-LFLAGS=   -lpthread -lz -lm
+LFLAGS= -lpthread -lz -lm
 
 INC=  -I./inc 
 
+OS_NAME := $(shell uname -s)
 
 C_SRC    := $(wildcard $(SRC)/*.c)
 C_OBJS   := $(C_SRC:%.c=%.o)
@@ -26,6 +27,7 @@ CPP_SRC  := $(wildcard $(SRC)/*.cpp)
 CPP_OBJS := $(CPP_SRC:%.cpp=%.o)
 
 OBJECTS  += $(CPP_OBJS) $(C_OBJS)
+
 
 $(BINDIR)/$(TARGET): $(CPP_OBJS) $(C_OBJS)
 	@$(LL) $(OBJECTS)  $(LFLAGS) $(LDLIB_GTK)  -o ${TARGET}.o
@@ -37,6 +39,9 @@ $(CPP_OBJS): $(OBJ)%.o :%.cpp
 	@echo "[CC] "$<
 
 $(C_OBJS): $(OBJ)%.o : %.c
+	ifeq ($(UNAME_S),Linux)
+		CCFLAGS += -Wno-format-overflow 
+	endif
 	@$(CC)  $(CFLAGS) $(CFLAG_GTK) -c $<  -o $@ ${INC} -Wno-deprecated
 	@echo "[CC] "$<	
 
