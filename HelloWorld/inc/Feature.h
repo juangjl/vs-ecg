@@ -19,6 +19,5 @@
 	#define ARCH_WIN32										///< default: off, windows  on; other : off
 #endif ///< for has_include
 
-
 #endif  ///< for #ifndef __FEATURE_H__
 
