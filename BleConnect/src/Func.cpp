@@ -74,6 +74,7 @@ JBOOL FuncMBleScan(void)
 	BleDeviceItemType *pItem = NULL;
 	char msg[256];
 	iErrNo = CmdMBleScan();
+	JINT iRSSI = 0;
 
 	if(iErrNo == NO_ERR)
 	{		
@@ -82,12 +83,13 @@ JBOOL FuncMBleScan(void)
 		for(i = 0 ; i < GlobalVar.BleDeviceList.iCnt; i = i + 1)
 		{
 			pItem =  &GlobalVar.BleDeviceList.BleDeviceItems[i];
+			iRSSI = pItem->bRSSI;
 			printf("\t#%-2d: %-24s, %02X-%02X-%02X-%02X-%02X-%02X, %02d db\r\n",  
 							i,
 							pItem->name,
 							pItem->bAddr[0], pItem->bAddr[1], pItem->bAddr[2],
 							pItem->bAddr[3], pItem->bAddr[4], pItem->bAddr[5],
-							pItem->bRSSI);
+							iRSSI);
 		}
 	}
 	else
