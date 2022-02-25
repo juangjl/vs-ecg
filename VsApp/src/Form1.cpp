@@ -33,15 +33,6 @@ static JINT LabelInit(void)
 	ViewDataForm1Type * pViewDataPtr = &ViewDataForm1;
 	JINT iRet = TRUE;
 	GtkWidget *pLabel 	= NULL;
-
-	///-----------------------------------------------------------------------///
-	/// Label main
-	///-----------------------------------------------------------------------///
-	pViewDataPtr->pLabelMain =gtk_label_new_with_mnemonic("Label1");
-	pLabel = pViewDataPtr->pLabelMain;
-  gtk_widget_set_name(pLabel, "");  
-  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, 20, 50);
-  gtk_widget_show(pLabel);
  
 
 	return TRUE;
@@ -75,12 +66,7 @@ static JINT FrameInit(void)
 	JINT iRet = TRUE;
 	ViewDataForm1Type * pViewDataPtr = &ViewDataForm1;	
   GtkWidget * pFrame = gtk_frame_new ("");
-  
-  gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
-  gtk_frame_set_label_align (GTK_FRAME (pFrame), 0, 0.5);
-  gtk_widget_set_size_request(pFrame, 600, 120); 
-  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pFrame, 10, 10);
-  gtk_widget_show(pFrame);
+
 
   return iRet;  
 }
@@ -95,13 +81,6 @@ static JINT TimerInit()
 
 static JINT DrawAreaInit()
 {
-	JINT x0 = 0;
-	JINT y0 = 0;	
-	JINT wd = 0;
-	JINT ht = 0;	
-	GtkWidget * pDrawArea = NULL; 
-	ViewDataForm1Type * pViewDataPtr = (ViewDataForm1Type *)pThis->pViewData;	
-
 
 	return TRUE;
 }
