@@ -1,2 +1,2 @@
 export app=$(basename "$PWD")
-./out/$app.o
+./out/$app.o &

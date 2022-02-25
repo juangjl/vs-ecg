@@ -25,15 +25,24 @@ void VarInit(void)
 void MainInit(void)
 {
 	char strFolderName[256];
+	
+	///-------------------------------------------------------------------------///
+	/// Config Load
+	///-------------------------------------------------------------------------///
+	ConfigLoad();
 
-	/// Init Variable
+	///-----------------------------------------------------------------------------///
+	/// Variable Init
+	///-----------------------------------------------------------------------------///
 	VarInit();	
 
-	/// init print	
+	///-----------------------------------------------------------------------------///
+	/// Hello Print
+	///-----------------------------------------------------------------------------///
 	printf("\r\n");
 	printf("\r\n");	
 	printf("--------------------------------------------------------------\r\n");
-	printf(" VSC Mode (V1.0) programmed by JL JUANG 										\r\n");
+	printf(" VS-APP (V1.0) programmed by JL JUANG 										\r\n");
 	printf("--------------------------------------------------------------\r\n");
 	printf("\r\n");
 
@@ -45,10 +54,17 @@ void MainInit(void)
 	sprintf(strFolderName, "%s/data", (char *)&GlobalVar.strCurDir[0]);
 	ConfigStrSet((char *)CONFIG_ITEM_DATA_ROOT, strFolderName);			
 	UtilFolderCreate(strFolderName);
+
+	///-------------------------------------------------------------------------///
+	/// APP UI Init
+	///-------------------------------------------------------------------------///
+	AppInit();
 }
 
 JINT main(int argc, char *argv[])
 { 
+	gtk_init(&argc, &argv);
+
 	MainInit(); 	
 	Mainloop();	
   return 0;
@@ -60,9 +76,6 @@ JINT main(int argc, char *argv[])
 void Mainloop()
 {
 	/*
-	ConfigLoad();
-
-	TaskRoundInit();
 
 	TaskVsDongleOpen();
 
@@ -73,11 +86,24 @@ void Mainloop()
 	TaskVSH101Close();
 
 	TaskVsDongleClose();
+	
+	*/
+	
+	while(1)
+	{
+		TaskRoundInit();
+		
+		TaskApp();
 
-	TaskRoundEnd();
+		TaskRoundEnd();		
+		
+		if(GlobalVar.bAppExit == TRUE)
+		{
+			break;
+		}
+	}
 
 	ConfigSave();
-	*/
 
 	printf("\r\nbyebye\r\n");
 	return;

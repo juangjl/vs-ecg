@@ -1,7 +1,7 @@
 /**
  * @file app.cpp
  *
- *   app 
+ *   APP function 
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
@@ -25,34 +25,13 @@ gboolean CallbackWindowDelete(GtkWidget *widget, GdkEvent *event, gpointer data)
 
 void CallbackWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
-  printf("Destroy callback...\n");  
+  printf("Window Destroy ...\n");  
  	GlobalVar.bAppExit = TRUE;    
-  //gtk_main_quit();
 }
 
-static void CallbackMenuItemFileLoadClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
+static void CallbackMenuItemClose(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
-	AppActiveViewSet(&JVForm1);
-}
-
-static void CallbackMenuItemMonitorClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
-{
-	//AppActiveViewSet(&JVForm5);
-}
-
-static void CallbackMenuItemMeasurementClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
-{
-	//AppActiveViewSet(&JVForm4);
-}
-
-static void CallbackMenuItemBleControlClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
-{
-	//AppActiveViewSet(&JVForm3);
-}
-
-static void CallbackMenuItemSerialPortClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
-{
-	//AppActiveViewSet(&JVForm2);
+	GlobalVar.bAppExit = TRUE;    
 }
 
 void AppCssLoad()
@@ -125,7 +104,6 @@ void AppWindowInit()
 
   g_signal_connect(G_OBJECT(AppPtr->pWindow), "delete_event", G_CALLBACK(CallbackWindowDelete), NULL);
   g_signal_connect(G_OBJECT(AppPtr->pWindow), "destroy",      G_CALLBACK(CallbackWindowDestroy), NULL);
-
 }
 
 void AppMainMenuSet(GtkWidget *pView)
@@ -139,11 +117,6 @@ void AppMainMenuSet(GtkWidget *pView)
 
 	GtkWidget * pMenuItemRootFile	 = NULL;
 
-	GtkWidget * pMenuItemFileLoad	 			= NULL;	
-	GtkWidget * pMenuItemMonitor	 			= NULL;	
-	GtkWidget * pMenuItemBleControl	 		= NULL;		
-	GtkWidget * pMenuItemMeasurement	 	= NULL;		
-	GtkWidget * pMenuItemSerialPort			= NULL;	
 	GtkWidget * pMenuItemClose  				= NULL;
 	
 	
@@ -151,31 +124,17 @@ void AppMainMenuSet(GtkWidget *pView)
   pMenuFile = gtk_menu_new();
 
 
-  pMenuItemRootFile  = gtk_menu_item_new_with_label("VS-ECG");   
+  pMenuItemRootFile  = gtk_menu_item_new_with_label("VS-APP");   
   
-  pMenuItemFileLoad  		= gtk_menu_item_new_with_label("File Load");  
-	pMenuItemMonitor  		= gtk_menu_item_new_with_label("Monitor");  
-  pMenuItemMeasurement  = gtk_menu_item_new_with_label("Measurement");      
-  pMenuItemBleControl  	= gtk_menu_item_new_with_label("BLE Conrtol");  
-  pMenuItemSerialPort  	= gtk_menu_item_new_with_label("Serial Port");    
+
   pMenuItemClose 				= gtk_menu_item_new_with_label("Close");
   
   
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(pMenuItemRootFile), pMenuFile);
     
-	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemFileLoad);
-	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemMonitor);
-	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemMeasurement);
-	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemBleControl);
-	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemSerialPort);
 	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemClose);
 
-	g_signal_connect(G_OBJECT(pMenuItemFileLoad),   	"activate",   G_CALLBACK(CallbackMenuItemFileLoadClicked), 		NULL);
-	g_signal_connect(G_OBJECT(pMenuItemMonitor),   		"activate",   G_CALLBACK(CallbackMenuItemMonitorClicked), 		NULL);
-	g_signal_connect(G_OBJECT(pMenuItemMeasurement),	"activate",   G_CALLBACK(CallbackMenuItemMeasurementClicked), NULL);
-	g_signal_connect(G_OBJECT(pMenuItemBleControl),	  "activate",   G_CALLBACK(CallbackMenuItemBleControlClicked), 	NULL);
-	g_signal_connect(G_OBJECT(pMenuItemSerialPort),  	"activate",   G_CALLBACK(CallbackMenuItemSerialPortClicked), 	NULL);
-	g_signal_connect(G_OBJECT(pMenuItemClose),				"activate",   G_CALLBACK(gtk_main_quit), 	(void *)"QUIT");
+	g_signal_connect(G_OBJECT(pMenuItemClose),  	"activate",   G_CALLBACK(CallbackMenuItemClose), 	NULL);
 
 	/// increase the menu width
   gtk_widget_set_size_request(pMenuItemRootFile, 80, 30); 
@@ -212,7 +171,7 @@ void AppInit(void)
   
   ///-------------------------------------------------------///
   /// Set view
-  ///--------q-----------------------------------------------///
+  ///-------------------------------------------------------///
   AppPtr->pViewArr[0] = &JVForm1;
   //AppPtr->pViewArr[1] = &JVForm2;  
   //AppPtr->pViewArr[2] = &JVForm3;  

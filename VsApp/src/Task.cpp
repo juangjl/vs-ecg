@@ -18,6 +18,14 @@ void TaskRoundInit(void)
 	
 }
 
+void TaskApp(void)
+{
+	if(gtk_events_pending())
+	{
+		gtk_main_iteration();
+	}
+}
+
 void TaskVsDongleOpen(void)
 {
 	JBOOL bRet = FALSE;

@@ -13,6 +13,8 @@
 
 extern void 	TaskRoundInit(void);
 
+extern void   TaskApp(void);
+
 extern void   TaskVsDongleOpen(void);
 
 extern void   TaskVSH101Open(void);

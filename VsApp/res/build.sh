@@ -1,0 +1,1 @@
+windres.exe app.rc -O coff -o app.res
