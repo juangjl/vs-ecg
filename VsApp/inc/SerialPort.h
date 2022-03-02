@@ -1,7 +1,7 @@
 /**
- * @file serial.h
+ * @file SerialPort.h
  *
- *  serial function
+ *  Serial port function
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>

@@ -340,6 +340,56 @@ JINT CmdSBleSysVersionGet(void)
   return iErrNo;
 }
 
+JINT CmdSBleSysTimeSet(void)
+{
+  JINT iErrNo = NO_ERR;
+
+  PacketType    PacketOut;
+  PacketAckType PacketIn;
+  
+  JINT 	iTimeout = 3500;
+  JINT  iDevVersoin;
+  char 	strDevName[256];  
+  char 	msg[256];
+  time_t t = time(NULL);
+  JTM jtm;
+
+  /// Set time
+  JTMTimeZoneSecSet(&jtm, GlobalVar.iTimeZoneSec);
+  JTMLocalTimeGet(&jtm, t);
+  
+  PacketInit(&PacketOut);
+  
+  /// output packet set
+  PacketOut.bGroupId 	= CMD_GROUP_ID_SYS;
+  PacketOut.bCmd 			= CMD_SYS_TIME_SET;
+  PacketOut.bPCode 		= CMD_SYS_TIME_SET;
+  PacketOut.wMOSILen 	= 16 + PACKET_CMD_BDATA_SIZE;
+  PacketOut.wMISOLen 	= 32;
+
+
+	*(JWORD *)&PacketOut.bCmdData[0] = (JWORD) jtm.iYear;
+	*(JBYTE *)&PacketOut.bCmdData[2] = (JBYTE) jtm.iMonth;
+	*(JBYTE *)&PacketOut.bCmdData[3] = (JBYTE) jtm.iDay;
+	*(JBYTE *)&PacketOut.bCmdData[4] = (JBYTE) jtm.iHour;	
+	*(JBYTE *)&PacketOut.bCmdData[5] = (JBYTE) jtm.iMin;		
+	*(JBYTE *)&PacketOut.bCmdData[6] = (JBYTE) jtm.iSec;			
+
+  *(JINT  *)&PacketOut.bCmdData[8]  = (JINT) t;
+  *(JINT  *)&PacketOut.bCmdData[12] = jtm.iTimeZoneSec ;
+
+  
+  /// slave packet Cmd
+	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
+
+	if(PacketIn.bAck != 'A')
+  {
+    printf("[ERROR] SYS TIME SET\r\n");
+    iErrNo = ERR_WRONG_ARG_FORMAT;
+  }  
+  return iErrNo;
+}
+
 JINT CmdSBleSysSsnSet(char *pSSN)
 {
   JINT iErrNo = NO_ERR;
@@ -543,5 +593,35 @@ JINT CmdSBleVscModeRead(void)
   GlobalVar.bVscModeAdded = TRUE;
 	
 	VscMode.wId = (VscMode.wId + 1) % VSC_MODE_IDX_MAX;		
+  return iErrNo;
+}
+
+JINT CmdSBleMonitorMode(JINT *piMonitorMode)
+{
+  JINT iErrNo = NO_ERR;
+  PacketType    PacketOut;
+  PacketAckType PacketIn;
+  JINT 	iTimeout = 3500;
+
+  PacketInit(&PacketOut);
+  
+  /// output packet set
+  PacketOut.bGroupId 	= CMD_GROUP_ID_BLE;
+  PacketOut.bCmd 			= CMD_BLE_MONITOR_MODE;
+  PacketOut.bPCode 		= CMD_BLE_MONITOR_MODE;
+  PacketOut.wMOSILen 	= 0;
+  PacketOut.wMISOLen 	= 4;
+  
+  /// slave packet Cmd
+	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
+
+	if(PacketIn.bAck != 'A')
+  {
+    printf("[ERROR]MEAS Stop NACK\r\n");
+    iErrNo = ERR_WRONG_ARG_FORMAT;
+  }
+	UtilMemcpy((JBYTE *)piMonitorMode, (JBYTE *)&PacketIn.bData[0], 4);	
+	printf("[BLE] MONITOR_MODE = %d\r\n", *piMonitorMode);
+	
   return iErrNo;
 }

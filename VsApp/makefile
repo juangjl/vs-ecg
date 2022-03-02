@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------#
+
 # File : Makefile 
 # Author: jl_juang@vsigntek.com
 # Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
@@ -28,7 +29,7 @@ OS_TYPE=OS_TYPE_WINDOWS
 CFLAGS_OS=
 
 ifeq ($(OS_NAME), Linux)
-	CFLAGS_OS= -Wno-format-overflow
+	CFLAGS_OS= -Wno-format-overflow  -Wno-conversion-null -Wno-pointer-arith
 	OS_TYPE=OS_TYPE_UBUNTU
 endif
 

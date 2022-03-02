@@ -33,9 +33,10 @@ typedef struct JViewST
 
 extern JView 	JVForm1;
 extern JView 	JVForm2;
-extern JView 	JVForm3;
-extern JView 	JVForm4;
-extern JView 	JVForm5;
+
+//extern JView 	JVForm3;
+//extern JView 	JVForm4;
+//extern JView 	JVForm5;
 
 extern void 	JViewButtonEnable(GtkWidget *pButton);
 extern void 	JViewButtonDisable(GtkWidget *pButton);

@@ -1,5 +1,5 @@
 /**
- * @file comPort.h
+ * @file ComPort.h
  *
  *  com port function for windows
  *

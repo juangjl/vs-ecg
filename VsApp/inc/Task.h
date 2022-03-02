@@ -1,7 +1,7 @@
 /**
  * @file Task.h
  *
- *  task function
+ *  Task function
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
@@ -15,15 +15,13 @@ extern void 	TaskRoundInit(void);
 
 extern void   TaskApp(void);
 
-extern void   TaskVsDongleOpen(void);
+extern void   TaskSerialPort(void);
 
-extern void   TaskVSH101Open(void);
+extern void   TaskBleControl(void);
 
-extern void   TaskVSH101Read(void);
+extern void   TaskBleState(void);
 
-extern void   TaskVSH101Close(void);
-
-extern void   TaskVsDongleClose(void);
+extern void   TaskBleVscMode(void);
 
 extern void 	TaskRoundEnd(void);
 

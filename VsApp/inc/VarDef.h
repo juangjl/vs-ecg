@@ -1,5 +1,5 @@
 /**
- * @file vardef.h
+ * @file VarDef.h
  *
  *  variable define
  *

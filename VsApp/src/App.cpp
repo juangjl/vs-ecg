@@ -1,11 +1,11 @@
 /**
  * @file app.cpp
  *
- *   APP function 
+ *  APP function 
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
- * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd.,, all rights reserved.
+ * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  * @note
 */
 ///------------------------------------------///
@@ -13,13 +13,11 @@
 ///------------------------------------------///
 #include "Global.h"
 
-AppType App;
+AppType   App;
 AppType * AppPtr = &App;
 
 gboolean CallbackWindowDelete(GtkWidget *widget, GdkEvent *event, gpointer data)
-{
-  printf("delete event occured\n");
-
+{  
   return FALSE;
 }
 
@@ -29,6 +27,16 @@ void CallbackWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
  	GlobalVar.bAppExit = TRUE;    
 }
 
+static void CallbackMenuItemMain(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	AppActiveViewSet(&JVForm1);
+}
+
+static void CallbackMenuItemConfig(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	AppActiveViewSet(&JVForm2);
+}
+
 static void CallbackMenuItemClose(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	GlobalVar.bAppExit = TRUE;    
@@ -36,21 +44,21 @@ static void CallbackMenuItemClose(GtkWidget *widget, GdkEvent *event, gpointer d
 
 void AppCssLoad()
 {
-    GdkDisplay * pGtkDisplay = NULL;
-    GdkScreen  * pGtkScreen  = NULL;
+  GdkDisplay * pGtkDisplay = NULL;
+  GdkScreen  * pGtkScreen  = NULL;
 
-    const gchar *pCssFile = "./css/jstyle.css";
-    GError *error = 0;
+  const gchar *pCssFile = "./css/jstyle.css";
+  GError *error = 0;
 
-    AppPtr->pProvider = gtk_css_provider_new();
-    pGtkDisplay  					= gdk_display_get_default();
-    pGtkScreen   					= gdk_display_get_default_screen(pGtkDisplay);
-    gtk_style_context_add_provider_for_screen (pGtkScreen, GTK_STYLE_PROVIDER (AppPtr->pProvider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  AppPtr->pProvider = gtk_css_provider_new();
+  pGtkDisplay  					= gdk_display_get_default();
+  pGtkScreen   					= gdk_display_get_default_screen(pGtkDisplay);
+  gtk_style_context_add_provider_for_screen (pGtkScreen, GTK_STYLE_PROVIDER (AppPtr->pProvider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    gtk_css_provider_load_from_file(AppPtr->pProvider, g_file_new_for_path(pCssFile), &error);
-    g_object_unref(AppPtr->pProvider);
-
+  gtk_css_provider_load_from_file(AppPtr->pProvider, g_file_new_for_path(pCssFile), &error);
+  g_object_unref(AppPtr->pProvider);
 }
+
 JINT AppWindowIconSet()
 {
 	GdkPixbuf *pPixbuf;
@@ -114,32 +122,39 @@ void AppMainMenuSet(GtkWidget *pView)
 	GtkWidget * pMenubar  = NULL; 
 	GtkWidget * pMenuFile = NULL;
 
+/// Manu Item Root
+	GtkWidget * pMenuItemRootVsApp	 = NULL;
 
-	GtkWidget * pMenuItemRootFile	 = NULL;
-
-	GtkWidget * pMenuItemClose  				= NULL;
+  /// Manu Item
+  GtkWidget * pMenuItemMain    	 = NULL;
+  GtkWidget * pMenuItemControl   = NULL;
+	GtkWidget * pMenuItemClose  	 = NULL;
+  
 	
 	
  	pMenubar  = gtk_menu_bar_new();
   pMenuFile = gtk_menu_new();
 
 
-  pMenuItemRootFile  = gtk_menu_item_new_with_label("VS-APP");   
-  
+  pMenuItemRootVsApp  = gtk_menu_item_new_with_label("VS-APP");     
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(pMenuItemRootVsApp), pMenuFile);
 
-  pMenuItemClose 				= gtk_menu_item_new_with_label("Close");
+  pMenuItemMain				= gtk_menu_item_new_with_label("Main");
+  pMenuItemControl		= gtk_menu_item_new_with_label("Control");
+  pMenuItemClose 			= gtk_menu_item_new_with_label("Close");
   
-  
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(pMenuItemRootFile), pMenuFile);
-    
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemMain);  
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemControl);  
 	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemClose);
 
-	g_signal_connect(G_OBJECT(pMenuItemClose),  	"activate",   G_CALLBACK(CallbackMenuItemClose), 	NULL);
+  g_signal_connect(G_OBJECT(pMenuItemMain),  	  "activate",   G_CALLBACK(CallbackMenuItemMain), 	  NULL);
+  g_signal_connect(G_OBJECT(pMenuItemControl),  "activate",   G_CALLBACK(CallbackMenuItemConfig), 	NULL);
+	g_signal_connect(G_OBJECT(pMenuItemClose),  	"activate",   G_CALLBACK(CallbackMenuItemClose), 	  NULL);
 
 	/// increase the menu width
-  gtk_widget_set_size_request(pMenuItemRootFile, 80, 30); 
+  gtk_widget_set_size_request(pMenuItemRootVsApp, 80, 30); 
   
-  gtk_menu_shell_append(GTK_MENU_SHELL(pMenubar), pMenuItemRootFile);
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenubar), pMenuItemRootVsApp);
 
   gtk_container_add(GTK_CONTAINER(pView), pMenubar);
   gtk_widget_show_all(pMenubar);
@@ -160,11 +175,6 @@ void AppInit(void)
 	JINT i = 0;
 	JView *pView = NULL;
 
-	///--------------------------------------------------------------------------------------------///
-	/// GTK Version Print
-	///--------------------------------------------------------------------------------------------///	
-	printf("GTK VERSION  = %d.%d.%d\r\n",	GTK_MAJOR_VERSION, 	GTK_MICRO_VERSION, 	GTK_MINOR_VERSION);
-	
   AppCssLoad();  
 	
   AppWindowInit();
@@ -173,10 +183,7 @@ void AppInit(void)
   /// Set view
   ///-------------------------------------------------------///
   AppPtr->pViewArr[0] = &JVForm1;
-  //AppPtr->pViewArr[1] = &JVForm2;  
-  //AppPtr->pViewArr[2] = &JVForm3;  
-  //AppPtr->pViewArr[3] = &JVForm4;  
-	//AppPtr->pViewArr[4] = &JVForm5;  
+  AppPtr->pViewArr[1] = &JVForm2;  
 
   for(i = 0 ; i < JVIEW_CNT; i = i + 1)
 	{

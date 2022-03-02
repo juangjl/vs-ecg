@@ -1,5 +1,5 @@
 /*
-* @file cairo.h
+* @file Cairo.h
 * @brief Cairo
 * @version $Revision$
 * @author JL JUANG

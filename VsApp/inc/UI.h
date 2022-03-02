@@ -1,5 +1,5 @@
 /**
- * @file ui.h
+ * @file UI.h
  *
  *  ui header
  *
@@ -23,6 +23,10 @@ typedef struct JRectSt
 	JWORD x1;		
 	JWORD y1;			
 } JRect;
+
+#ifndef RGB
+#define RGB(r,g,b) 		(JDWORD)(((r&0xFF)<<16)|((g & 0xFF)<<8)|(b & 0xFF))
+#endif ///< for RGB
 
 ///---------------------------------------------------------------------------///
 /// COLOR

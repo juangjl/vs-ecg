@@ -466,12 +466,12 @@ void UtilCurDirGet(char * pCurrDir)
 	if(getcwd(pCurrDir, 256) != NULL)
 	{
   	sprintf(msg, "Current working dir: %s\n", pCurrDir);
-  	DBG_PRINTF(msg);
+  	//DBG_PRINTF(msg);
   }
 	else
 	{
 		sprintf(pCurrDir, "%s", "./");
-  	sprintf(msg, "Cannot find current working dir, utlize %s\n", pCurrDir);
+  	sprintf(msg, "Cannot find current working dir, utilize %s\n", pCurrDir);
   	DBG_PRINTF(msg);		
 	}
 }

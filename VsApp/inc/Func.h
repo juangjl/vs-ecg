@@ -11,6 +11,8 @@
 #ifndef __FUNC_H__
 #define __FUNC_H__
 
+extern JBOOL FuncBleOpenCheck(void);
+
 extern JBOOL FuncVSDongleOpen(char *strPortName);
 extern JBOOL FuncVSDongleClose(void);
 

@@ -1,3 +1,13 @@
+/**
+ * @file Define.h
+ *
+ *  General Definition
+ *
+ * @version $Revision$
+ * @author JLJuang <jl_juang@vsigntek.com>
+ * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
+ * @note
+*/
 #ifndef __DEFINE_H__
 #define __DEFINE_H__ 
 
@@ -78,6 +88,7 @@
 
 #define SYS_CTL2_TIMER_100MS_EVT				  (1<<20)
 #define SYS_CTL2_TIMER_10MS_EVT					  (1<<21)
+#define SYS_CTL2_TIMER_20MS_EVT					  (1<<22)
 
 
 #endif ///<  __DEFINE_H__

@@ -9,6 +9,25 @@
  */
 #include "Global.h"
 
+JBOOL FuncBleOpenCheck(void)
+{
+	JINT iErrNo = NO_ERR;
+	JINT iRet = 0;
+
+	JBOOL bConnect = FALSE;
+
+	///----------------------------------------------------------------///
+	/// Connection
+	///----------------------------------------------------------------///
+	iErrNo = CmdMBleConnectStatus(&GlobalVar.bBleConnected);
+	if(iRet != NO_ERR)
+	{
+		GlobalVar.dwSysSta5 &= ~SYS_STA5_SERIAL_PORT_OPEN;		
+		return FALSE;
+	}
+	return TRUE;
+}
+
 JBOOL FuncVSDongleOpen(char *strPortName)
 {
 	JBOOL bSerialOpen = FALSE;
@@ -151,8 +170,7 @@ JBOOL FuncMBleSelect(void)
 	}		
 	
 	sprintf(msg, "\t\t device selected\r\n");
-	return FALSE;
-	
+	return FALSE;	
 }
 
 JBOOL FuncMBleOpen(void)
@@ -313,10 +331,7 @@ JBOOL FuncVscModeInit(void)
 	JTM jtm;	
 	time_t t = time(NULL);
 
-	if(GlobalVar.bVscMode == FALSE)
-	{
-		return FALSE;
-	}
+	GlobalVar.bVscModeReadOn = FALSE;
 
 	///-------------------------------------------------------------------------///
 	/// Folder Create
@@ -345,6 +360,17 @@ JBOOL FuncVscModeInit(void)
 	UtilFolderCreate(strFolderName);
 
 	VscModeInit((char *)&strFolderName[0]);	
+
+	///------------------------------------------------------------///
+	/// Data Set Reset
+	///------------------------------------------------------------///
+	GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS0] = 0;
+	GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS1] = 0;
+	GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS2] = 0;
+
+	JDataSetReset(&GlobalVar.dataSet[DATASET_MONITOR_ECG_DS0]);
+	JDataSetReset(&GlobalVar.dataSet[DATASET_MONITOR_ECG_DS1]);
+	JDataSetReset(&GlobalVar.dataSet[DATASET_MONITOR_ECG_DS2]);
 	
 	return TRUE;
 }
@@ -365,7 +391,13 @@ JBOOL FuncVscModeStart(void)
 		return  FALSE;
 	}		
 
+	GlobalVar.bVscModeReadOn = FALSE;
+	GlobalVar.iBleState = BLE_STATE_VSC_MODE;
+
 	GlobalVar.bVscMode = TRUE;
+
+	GlobalVar.dwVscModeSec =  0;
+
 	return TRUE;
 }
 

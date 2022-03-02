@@ -240,7 +240,7 @@ void VscModeInfoSave(VscModeControlType *pVscMode)
 	fp  = fopen(pVscMode->strFileNameInfo, "a+");
 	if(fp == NULL)
 	{
-		sprintf(msg, "\t\t [VSC][ERROR] Failed to open %s\r\n", VscMode.strFileNameInfo);
+		sprintf(msg, "\t\t [VSC][ERROR] Failed to open '%s'\r\n", VscMode.strFileNameInfo);
 		DBG_PRINTF(msg);		
 		return;
 	}

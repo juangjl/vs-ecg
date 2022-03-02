@@ -75,25 +75,19 @@ JINT main(int argc, char *argv[])
 ///------------------------------------------///
 void Mainloop()
 {
-	/*
-
-	TaskVsDongleOpen();
-
-	TaskVSH101Open();
-
-	TaskVSH101Read();
-
-	TaskVSH101Close();
-
-	TaskVsDongleClose();
-	
-	*/
-	
 	while(1)
 	{
 		TaskRoundInit();
 		
 		TaskApp();
+
+		TaskSerialPort();
+
+		TaskBleControl();
+
+		TaskBleState();
+
+		TaskBleVscMode();
 
 		TaskRoundEnd();		
 		

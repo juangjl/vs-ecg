@@ -1,5 +1,5 @@
 /**
- * @file Draw.h
+ * @file JDraw.h
  * @brief Draw controller
  * @version $Revision$
  * @author JL JUANG
