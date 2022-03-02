@@ -66,7 +66,7 @@ JINT AppWindowIconSet()
   
 	char strFileName[512];
 
-	sprintf(strFileName, "%s/img/logo.png", GlobalVar.strCurDir);
+	sprintf(strFileName, "%s/img/Logo.png", GlobalVar.strCurDir);
 	
 	UtilWinPathNameSet(strFileName);
 	
