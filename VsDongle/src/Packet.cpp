@@ -89,7 +89,7 @@ JVOID PacketCheckSumSet(PacketType *pPacket)
 {	
 	JBYTE bCheckSum = 0;
 	pPacket->bCheckSum = 0;
-	PacketCheckSumGet(pPacket);
+	bCheckSum = PacketCheckSumGet(pPacket);
 	pPacket->bCheckSum =  bCheckSum;	
 }
 
