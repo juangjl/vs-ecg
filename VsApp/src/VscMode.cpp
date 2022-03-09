@@ -140,8 +140,7 @@ void VscModeInfoParse(VscModeControlType *pVscMode)
 		pVscMode->fHrvLFHF = (pVscMode->fHrvLF / pVscMode->fHrvHF);
 	}
 	JTMLocalTimeGet(&pVscMode->jtm, 	pVscMode->dwUTC);
-	pVscMode->jtm.iMS = ( pItem->wId % 5) * 200;
-	
+	pVscMode->jtm.iMS = ( pItem->wId % 5) * 200;	
 }
 
 void VscModeInfoHeaderSave(FILE *fp)
