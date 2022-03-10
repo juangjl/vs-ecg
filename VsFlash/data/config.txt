@@ -1,0 +1,6 @@
+COM_PORT=COM7
+INIT_CONNECT=TRUE
+SERIAL_PORT=/dev/ttyUSB0
+DATA_ROOT=/media/psf/Home/WORK/vsecg_project/VsFlash/data
+FILE_NAME=/media/psf/Home/WORK/gtk_project/VsFlash/data/VSH101/application.gbl
+TIME_ZONE_SEC=28800
