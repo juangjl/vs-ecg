@@ -542,7 +542,7 @@ JINT CmdSBleVscModeRead(void)
   PacketAckType PacketIn;
   
   VscModeControlType * pVscMode = NULL;
-  JINT 	iTimeout = CMD_TIMEOUT_200MS;
+  JINT 	iTimeout = CMD_TIMEOUT_300MS;
   
 	static JINT iErrCnt = 0;
 
