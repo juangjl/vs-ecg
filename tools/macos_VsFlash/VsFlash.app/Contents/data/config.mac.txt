@@ -1,0 +1,6 @@
+COM_PORT=COM7
+INIT_CONNECT=TRUE
+SERIAL_PORT=/dev/cu.usbserial-11130
+DATA_ROOT=/Users/yeguanliang/SVN/VsFlash/data
+FILE_NAME=/Users/jl_juang/WORK/gtk_project/VsFlash/data/VSH101/application.gbl
+TIME_ZONE_SEC=28800
