@@ -1,0 +1,157 @@
+#myButton_blue
+{
+    background-color: blue;
+    color: white;
+    font-family: DejaVu Sans;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    border-radius: 15px;
+}
+
+#form1_label_main
+{
+  font-size:14px;
+  color: rgba(12, 12, 12, 1);
+}
+
+#form1_entry_filepath
+{
+  font-size:12px;
+  background-color:rgba(255, 255, 255, 1);
+  color: rgba(12, 12, 12, 1);
+}
+
+#form1_entry_chart_ecg_time
+{
+  font-size:12px;
+  background-color:rgba(0, 255, 255, 1);
+  color: rgba(12, 12, 12, 1);
+  min-height:12px;
+}
+
+#entry_display
+{
+  font-size:12px;
+  background-color:rgba(0, 255, 255, 1);
+  color: rgba(12, 12, 12, 1);
+  min-height:14px;
+}
+
+#list_header
+{
+    background-color:rgba(170, 170, 170, 1);
+    color: white;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#list1_header0
+{
+    background-color:rgba(170, 170, 170, 1);
+    color: white;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#list1_header1
+{
+    background-color:rgba(170, 170, 170, 1);
+    color: white;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#list1_header2
+{
+    background-color:rgba(170, 170, 170, 1);
+    color: white;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#form3_label_ble_device_name
+{
+  font-size:12px;
+  background-color:rgba(225, 225, 225, 1);  
+  color: rgba(12, 12, 150, 1);
+}
+
+#form3_label_ble_device_mac
+{
+  font-size:12px;
+  background-color:rgba(225, 225, 225, 1);  
+  color: rgba(12, 12, 150, 1);
+}
+
+#label_type1
+{
+  font-size:12px;
+  background-color:rgba(225, 225, 225, 1);  
+  color: rgba(12, 12, 150, 1);
+}
+
+.button_disabled
+{
+	font-size:12px;
+	background-color:rgba(20, 20, 20,1);  
+	color: rgba(255, 225, 225, 1);
+}
+
+.button_disabled:hover
+{
+	font-size:12px;
+	background-color:rgba(20, 20, 20,1);  
+	color: rgba(255, 225, 225, 1);
+}
+
+/* labels */
+.label_title
+{
+    background-color:rgba(249, 102, 153, 1);
+    color: rgba(255, 255, 255, 1);
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.label_value
+{
+    background-color:rgba(255, 255, 255, 1);
+    color: rgba(64, 64, 64, 1);
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.label_unit
+{
+	background-color:rgba(170, 170, 170, 1);
+	color: rgba(64, 64, 128, 1);
+	font-style: normal;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+.label_value
+{
+    background-color:rgba(255, 255, 255, 1);
+    color: rgba(64, 64, 64, 1);
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+
+.label_type2
+{
+    background-color:rgba(255, 255, 255, 1);
+    color: rgba(0, 0, 255, 1);
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+}
