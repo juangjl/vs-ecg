@@ -17,9 +17,13 @@ extern void 	DbgPrintf0(char *msg); ///< with timestampe
 extern void	  DbgPrintf1(char *msg); ///< without timestampe
 extern int 		UtilGetch(void);
 
+extern void   UtilOSTypeGet(JINT *piOSType);
 
 extern time_t UtilMakeTime(JWORD wYear, JBYTE bMonth, JBYTE bDay, JBYTE bHH, JBYTE bMM, JBYTE bSS);
 extern JINT   UtilFileListGet(char *folderPath, char  * strFilter);
+
+#define       MEMCMP_SAME      (0)
+#define       MEMCMP_DIFF      (1)
 
 extern void   UtilMemcpy(JBYTE *dst, JBYTE *src, JINT iCnt);
 extern JBOOL  UtilMemcmp(JBYTE *dst, JBYTE *src, JINT iCnt);

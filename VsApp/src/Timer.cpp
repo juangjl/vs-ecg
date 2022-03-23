@@ -203,3 +203,20 @@ void TimerEventClear(void)
 	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_20MS_EVT);																				
 }
 
+void TimerStart(void)
+{
+	JINT iErr = 0;
+
+	///--------------------------------------------------------------------------------///
+	/// Seperate APP and Function 
+	///--------------------------------------------------------------------------------///
+	iErr = pthread_create(&GlobalVar.tid2, NULL, &ThreadTimer, NULL);	
+	if(iErr != 0)
+	{
+		printf("can't create thread :[%s]\r\n", strerror(iErr));
+	}
+	else
+	{		
+		pthread_detach(GlobalVar.tid2);		
+	}
+}

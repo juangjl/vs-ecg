@@ -71,9 +71,34 @@
 #define SYS_CTL6_BLE_MASTER_SCAN_START						(1<<0)
 #define SYS_CTL6_BLE_MASTER_SCAN_STOP							(1<<1)
 
-
 #define SYS_CTL6_BLE_MASTER_OPEN									(1<<2)
 #define SYS_CTL6_BLE_MASTER_CLOSE									(1<<3)
+
+#define SYS_CTL6_BLE_MASTER_BIT_MODE_START				(1<<4)
+#define SYS_CTL6_BLE_MASTER_BIT_MODE_STOP					(1<<5)
+
+#define SYS_CTL6_BLE_MASTER_MONITOR_START					(1<<6)
+#define SYS_CTL6_BLE_MASTER_MONITOR_STOP					(1<<7)
+
+#define SYS_CTL6_BLE_MASTER_NOTIFY_MODE1_START		(1<<9)
+#define SYS_CTL6_BLE_MASTER_NOTIFY_MODE1_STOP			(1<<10)
+
+#define SYS_CTL6_BLE_MASTER_NOTIFY_MODE2_START		(1<<11)
+#define SYS_CTL6_BLE_MASTER_NOTIFY_MODE2_STOP			(1<<12)
+
+#define SYS_CTL6_BLE_MASTER_VSC_MODE_START				(1<<13)
+#define SYS_CTL6_BLE_MASTER_VSC_MODE_STOP					(1<<14)
+
+#define SYS_CTL6_BLE_MASTER_SSN_SET     					(1<<15)
+#define SYS_CTL6_BLE_MASTER_SSN_GET     				  (1<<16)
+
+#define SYS_CTL6_BLE_MASTER_FILE_CLEAR  					(1<<17) ///< File list clear
+#define SYS_CTL6_BLE_MASTER_FILE_LIST_READ	      (1<<18) ///< File List Read
+#define SYS_CTL6_BLE_MASTER_FILE_READ	            (1<<19) ///< File Read
+
+
+
+#define SYS_CTL6_BLE_MASTER_BLE_TEST							(1<<20)
 
 ///---------------------------------------------------------------///
 /// SYS_STA6: BLE
@@ -81,11 +106,15 @@
 #define SYS_STA6_BLE_MASTER_SCAN_ON				        (1<<0)
 #define SYS_STA6_BLE_MASTER_SCAN_UPDATED	        (1<<1)
 
-#define SYS_CTL6_BLE_MASTER_VSC_MODE_START				(1<<13)
-#define SYS_CTL6_BLE_MASTER_VSC_MODE_STOP					(1<<14)
+#define SYS_STA6_BLE_MASTER_FILE_LIST_UPDATED	    (1<<8)  ///< update the file list UI
 
-#define SYS_CTL6_BLE_MASTER_SSN_SET     					(1<<15)
-#define SYS_CTL6_BLE_MASTER_SSN_GET     				  (1<<16)
+#define SYS_STA6_BLE_MASTER_FILE_READ_BLE       	(1<<9)  ///< read file
+#define SYS_STA6_BLE_MASTER_FILE_READ_UART       	(1<<10) ///< read file
+
+///---------------------------------------------------------------///
+/// SYS_CTL7: BLE
+///---------------------------------------------------------------///
+#define SYS_CTL7_MSG_SERIAL_POR_OPEN_FAILED				(1<<0)
 
 ///---------------------------------------------------------------///
 /// BLE_STATE
@@ -104,29 +133,107 @@
 ///---------------------------------------------------------------///
 #define BLE_OPEN_TIMEOUT             (10)
 
+#define FILE_DATA_MAX_SIZE           (3600 * 3 * 500) ///< 3600 sec x 3 hours X 500 Hz
+#define FILE_INFO_MAX_SIZE           (3600 * 3)       ///< 3600 sec x 3 hours X 1 Hz
+typedef struct VscInfoSt
+{
+  JTM jtm;  
+
+	/// VSC_MODE_INFO_TYPE0_TIME_UTC								(1)	
+	JDWORD dwUTC;
+
+	/// VSC_MODE_INFO_TYPE0_TEMP_T									(2)
+	JFLOAT fTemp;
+	
+	/// VSC_MODE_INFO_TYPE0_ECG_HR									(3)
+	JFLOAT fHRNow;
+
+	/// VSC_MODE_INFO_TYPE0_ECG_LEAD_OFF						(4)
+	JFLOAT fLeadOff;
+
+	/// VSC_MODE_INFO_TYPE0_GSEN_X									(5)
+	JFLOAT fGsenXNow;
+
+	/// VSC_MODE_INFO_TYPE0_GSEN_Y									(6)
+	JFLOAT fGsenYNow;
+
+	/// VSC_MODE_INFO_TYPE0_GSEN_Z									(7)
+	JFLOAT fGsenZNow;
+
+	/// VSC_MODE_INFO_TYPE0_BATT_SOC								(8)
+	JFLOAT fBattSoc;
+
+	/// VSC_MODE_INFO_TYPE0_BATT_TOTAL_SEC					(9)
+	JFLOAT fBattTotalSec;
+
+	/// VSC_MODE_INFO_TYPE0_HRV_SDNN								(10)
+	JFLOAT fHrvSDNN;
+	
+	/// VSC_MODE_INFO_TYPE0_HRV_NN50								(11)
+	JFLOAT fHrvNN50;
+
+	/// VSC_MODE_INFO_TYPE0_HRV_RMSSD								(12)
+	JFLOAT fHrvRMSSD;
+
+	/// VSC_MODE_INFO_TYPE0_HRV_RR									(13)
+	JFLOAT fHrvRR;
+
+	/// VSC_MODE_INFO_TYPE0_HRV_VLF									(14)
+	JFLOAT fHrvVLF;
+
+	/// VSC_MODE_INFO_TYPE0_HRV_LF									(15)
+	JFLOAT fHrvLF;
+
+	/// VSC_MODE_INFO_TYPE0_HRV_HF									(16)
+	JFLOAT fHrvHF;
+	
+	/// TP																					(17)
+	JFLOAT fHrvTP;	
+	
+	/// LF/TP																				(18)
+	JFLOAT fHrvLFTP;	
+	
+	/// HF/TP																				(19)
+	JFLOAT fHrvHFTP;	
+	
+	/// LF/HF																				(20)
+	JFLOAT fHrvLFHF;
+
+} VscInfoType;
+
 typedef struct GlobalVarSt
 {  
   ///=========================================///
   /// System Information
   ///=========================================///
-  JWORD wStatus;
-  JWORD wVersion;   
+  JWORD   wStatus;
+  JWORD   wVersion;   
+  
+  JINT    iOSType;
   
   ///=========================================///
-  /// system control variables
+  /// System control variables
   ///=========================================///
-  JDWORD dwSysCtl1; 
-  JDWORD dwSysCtl2; 
-  JDWORD dwSysCtl5;   ///< SERIAL PORT CONTROL : UI to Task
-  JDWORD dwSysCtl6;   ///< BLE CONTROL : UI to Task 
+  JDWORD  dwSysCtl1;   ///< Basic system control
+  JDWORD  dwSysCtl2;   ///< Time control
+  JDWORD  dwSysCtl3;   ///< ECG control 
+  JDWORD  dwSysCtl5;   ///< SERIAL PORT CONTROL : UI to Task
+  JDWORD  dwSysCtl6;   ///< BLE CONTROL : UI to Task 
+  JDWORD  dwSysCtl7;   ///< Message Box
 
-  JDWORD dwSysSta5;   ///< SERIAL PORT STATUS 
-  JDWORD dwSysSta6;   ///< BLE STATUS
+  JDWORD  dwSysSta5;   ///< SERIAL PORT STATUS 
+  JDWORD  dwSysSta6;   ///< BLE STATUS
 
   ///=========================================///
   /// APP
   ///=========================================///
-  JBOOL bAppExit;
+  JBOOL   bAppExit;
+
+  ///=========================================///
+  /// Serial Port
+  ///=========================================///
+  JINT    iSerialPortArrCnt;
+  char    strSerialPortArr[10][32];
 
 	///=========================================///
   /// TIME
@@ -137,32 +244,35 @@ typedef struct GlobalVarSt
   ///=========================================///
   /// Timer Control
   ///=========================================///
-  JINT iTimeMS;
+  JINT    iTimeMS;
   
-  JINT iTimeSec;
-  JINT iTimeSecPre;
+  JINT    iTimeSec;
+  JINT    iTimeSecPre;
 
 	/// Timer Event of software
-  JINT iTime100MS;  	///< 000 / 100 / 200 / 300 / 400 / 500 / 600 / 700 / 800 / 900
-  JINT iTime100MSPre;  
+  JINT    iTime100MS;  	///< 000 / 100 / 200 / 300 / 400 / 500 / 600 / 700 / 800 / 900
+  JINT    iTime100MSPre;  
 
-  JINT iTime10MS;  		///< 00 / 10 / 20 / 30 / 40 / 50 / 60 / 70 / 80 / 90
-  JINT iTime10MSPre;  
+  JINT    iTime10MS;  		///< 00 / 10 / 20 / 30 / 40 / 50 / 60 / 70 / 80 / 90
+  JINT    iTime10MSPre;  
 
   ///=========================================///
   /// Thread
   ///=========================================///
-   pthread_t    tid0;
+   pthread_t    tid0; ///< 
+   pthread_t    tid1; ///< MainLoop
+   pthread_t    tid2; ///< Timer
+   pthread_t    tid3; ///< SubLoop
   
   ///=========================================///
   /// Serial Port
   ///=========================================///
-  JBOOL bSerialPortOpen;
+  JBOOL   bSerialPortOpen;
 
   ///=========================================///
   /// BLE
   ///=========================================///
-  JBOOL 	bBleConnected;
+  JBOOL   bBleConnected;
   JINT	 	iBleState;
   JBYTE 	bBleMacAddr[6];
   JBOOL 	bBleScan;
@@ -181,8 +291,8 @@ typedef struct GlobalVarSt
   ///=========================================///
 	///	DataSet for charts
   ///=========================================///
-	JDataSet 	dataSet[DATASET_COUNT];
-  JINT      iDataSetTime[DATASET_COUNT];
+	JDataSet  dataSet[DATASET_COUNT];
+  JINT    iDataSetTime[DATASET_COUNT];
 
   ///=========================================///
   /// VSC Mode
@@ -193,10 +303,12 @@ typedef struct GlobalVarSt
   JINT    iVscModeArrIdx;  
   VscModeControlType vscModeArr[VSC_MODE_ARR_LEN];
 
-  JBOOL         bVscModeReadOn;
-  long          iVscModeMSPre;
+  JBOOL   bVscModeReadOn;
+  long    iVscModeMSPre;
 
-  JDWORD        dwVscModeSec; ///< VSC total run seconds
+  JDWORD  dwVscModeSec; ///< VSC total run seconds
+
+  JBOOL   bVscModeSave;
   
   ///=========================================///
   /// Data Save Path
@@ -209,7 +321,37 @@ typedef struct GlobalVarSt
   /// Social Security Number of Patient
   ///=========================================///
   char    strSSN[SSN_SIZE];
+
+  ///=========================================///
+  /// ECG CHART
+  ///=========================================///
+  JBOOL   bChartEcgRun;
+  JBOOL   bChartEcgReverse;
+  JBOOL   bChartLoadEcgDS0Draw;
   
+  ///=========================================///
+  /// Ecg Data load
+  ///=========================================///
+  char    strFileName[256];
+  char    strFolderName[256];
+  JINT    iFileDataCnt;
+  JFLOAT  fFileData[FILE_DATA_MAX_SIZE]; ///< 3 hours data most
+  JINT    iFileTimeMSNow;
+  JINT    iFileTimeMSTotal;
+  
+  ///=========================================///
+  /// Vsm Info File load
+  ///=========================================///
+  JINT    iVscInfoCnt;
+  VscInfoType VscInfoArr[FILE_INFO_MAX_SIZE];  
+
+  ///=========================================///
+  /// SREG
+  ///=========================================///
+  SRegType      SReg;
+  JBOOL         bSRegOn;
+  JBOOL         bSRegWrite;
+    
  } GlobalVarType;
 
 #pragma pack(pop)  /// push current alignment to stack

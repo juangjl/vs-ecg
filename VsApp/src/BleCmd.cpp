@@ -625,3 +625,71 @@ JINT CmdSBleMonitorMode(JINT *piMonitorMode)
 	
   return iErrNo;
 }
+
+JINT CmdSBleSRegRead(SRegType *pSReg)
+{
+  JINT iErrNo = NO_ERR;
+  PacketType    PacketOut;
+  PacketAckType PacketIn;
+  JINT 	iTimeout = 500;
+
+  PacketInit(&PacketOut);
+  
+  /// output packet set
+  PacketOut.bGroupId 	= CMD_GROUP_ID_SREG;
+  PacketOut.bCmd 			= CMD_SREG_READ;
+  PacketOut.bPCode 		= CMD_SREG_READ;
+  PacketOut.wMOSILen 	= SREG_NAME_SIZE;
+  PacketOut.wMISOLen 	= SREG_SIZE;
+
+  /// SReg Data Clear
+  UtilMemset((JBYTE *) &pSReg->bData[0], 0x00, SREG_DATA_SIZE);
+	
+  /// SReg Name Set
+  UtilMemcpy((JBYTE *) &PacketOut.bData[0],(JBYTE *)pSReg, SREG_NAME_SIZE);
+    
+  /// Slave packet Cmd Send
+	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
+
+	if(PacketIn.bAck != 'A')
+  {
+    printf("[ERROR] SREG READ NACK\r\n");
+    iErrNo = ERR_WRONG_ARG_FORMAT;
+  }  
+  /// SReg Data Set
+  UtilMemcpy((JBYTE *) &pSReg->bData[0],(JBYTE *)&PacketIn.bData[0], SREG_DATA_SIZE);
+	
+  return iErrNo;
+}
+
+JINT CmdSBleSRegWrite(SRegType *pSReg)
+{
+  JINT iErrNo = NO_ERR;
+  PacketType    PacketOut;
+  PacketAckType PacketIn;
+  JINT 	iTimeout = 500;
+
+  PacketInit(&PacketOut);
+  
+  /// output packet set
+  PacketOut.bGroupId 	= CMD_GROUP_ID_SREG;
+  PacketOut.bCmd 			= CMD_SREG_WRITE;
+  PacketOut.bPCode 		= CMD_SREG_WRITE;
+  PacketOut.wMOSILen 	= SREG_SIZE;
+  PacketOut.wMISOLen 	= 0;
+
+  /// SReg Name and Data Set
+  UtilMemcpy((JBYTE *) &PacketOut.bData[0], (JBYTE *)pSReg, SREG_SIZE);
+      
+  /// slave packet Cmd
+	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
+
+	if(PacketIn.bAck != 'A')
+  {
+    printf("[ERROR] SREG WRITE NACK\r\n");
+    iErrNo = ERR_WRONG_ARG_FORMAT;
+  }
+  return iErrNo;
+}
+
+

@@ -11,7 +11,10 @@
 #ifndef __THREAD_H__
 #define __THREAD_H__ 
 
-extern void * ThreadVscMode(void *arg);
+extern 	void * 	ThreadVscMode(void *arg);
+extern 	void * 	ThreadTimer(void *arg);
+extern 	void * 	ThreadMainLoop(void *arg);
+extern 	void * 	ThreadSubLoop(void *arg);
 
 #endif ///<  __THREAD_H__
 

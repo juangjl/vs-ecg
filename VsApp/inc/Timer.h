@@ -11,9 +11,15 @@
 #ifndef __TIMER_H__
 #define __TIMER_H__ 
 
+#define TIMER_FREQ        (100)
+#define TIMER_PERIOD_MS   (1000 / TIMER_FREQ)
+#define TASK_PERIOD_MS    (50)
+
 extern void TimerTick(void);
 extern void TimerEventSet(void);
 extern void TimerEventClear(void);
+
+extern void TimerStart(void);
 
 #endif ///<  __TIMER_H__
 

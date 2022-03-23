@@ -133,6 +133,7 @@ typedef struct JChartST
 
 	JFLOAT 	fYValMax;
 	JFLOAT 	fYValMin;
+	JFLOAT 	fYValAvg;
 	JFLOAT  fYValAmp;
 
 	JFLOAT 	fYValMaxPre;
@@ -171,58 +172,64 @@ typedef struct JChartST
 	JDraw 	*pDC;
 } JChart;
 
-extern  JVOID 	JChartInit(JChart *pThis);
+extern  void 	JChartInit(JChart *pThis);
 
-extern  JVOID 	JChartDataSet(JChart *pThis, JDataSet *pDataSet);
-extern  JBOOL 	JChartStatCalculate(JChart *pThis, JDataStat *pDataStat);
-extern  JVOID 	JChartDCSet(JChart *pThis, JDraw *pDC);
-extern  JBOOL 	JChartDCCheck(JChart *pThis);
+extern  void 	JChartDataSet(JChart *pThis, JDataSet *pDataSet);
+extern  JBOOL JChartStatCalculate(JChart *pThis, JDataStat *pDataStat);
+extern  void 	JChartDCSet(JChart *pThis, JDraw *pDC);
+extern  JBOOL JChartDCCheck(JChart *pThis);
 
-extern  void    JChartSampleRateSet(JChart *pThis, JFLOAT freq);
+extern  void  JChartSampleRateSet(JChart *pThis, JFLOAT freq);
 
-extern  JVOID 	JChartReset(JChart *pThis);
-extern  JVOID		JChartCellSet(JChart *pThis, JINT iRow, JINT iCol);
+extern  void 	JChartReset(JChart *pThis);
+extern  void	JChartCellSet(JChart *pThis, JINT iRow, JINT iCol);
 
-extern  JVOID 	JChartModeSet(JChart *pThis, JDWORD dwChartMode);
-extern  JVOID 	JChartModeClear(JChart *pThis,  JDWORD dwChartMode);
+extern  void 	JChartModeSet(JChart *pThis, JDWORD dwChartMode);
+extern  void 	JChartModeClear(JChart *pThis,  JDWORD dwChartMode);
 
-extern  JVOID 	JChartGridDraw(JChart *pThis);	
-extern  JVOID 	JChartGridAutoDraw(JChart *pThis);	
+extern  void 	JChartGridDraw(JChart *pThis);	
+extern  void 	JChartGridAutoDraw(JChart *pThis);	
 
-extern  JINT	 	JChartLineEcgDraw(JChart *pThis);	
-extern  JINT 		JChartLineTimeHourDraw(JChart *pThis);
+extern  JINT	JChartLineEcgDraw(JChart *pThis);	
+extern  JINT 	JChartLineTimeHourDraw(JChart *pThis);
 
-extern 	JINT 		JChartLineTimeDraw(JChart *pThis);
-extern  JVOID   JChartLineXYDraw(JChart *pThis);
+extern 	JINT 	JChartLineTimeDraw(JChart *pThis);
+extern  void  JChartLineXYDraw(JChart *pThis);
 
-extern  JVOID 	JChartBarDraw(JChart *pThis);		
-extern  JVOID   JChartCursorDraw(JChart *pThis);	
-extern  JVOID		JChartInfoDraw(JChart *pThis);
+extern  void 	JChartBarDraw(JChart *pThis);		
+extern  void  JChartCursorDraw(JChart *pThis);	
+extern  void	JChartInfoDraw(JChart *pThis);
 
-extern  JBOOL 	JChartLabelXDraw(JChart *pThis);
-extern  JBOOL	 	JChartLabelYDraw(JChart *pThis);	
-extern  JBOOL 	JChartLabelDraw(JChart *pThis);	
-extern  JBOOL 	JChartLabelXDrawEx(JChart *pThis, char *strStart, char *strCenter, char *strEnd);
+extern  JBOOL JChartLabelXDraw(JChart *pThis);
+extern  JBOOL	JChartLabelYDraw(JChart *pThis);	
+extern 	JBOOL	JChartLabelDraw(JChart *pThis, char * strLabel, JINT x, JINT y, JDWORD dwColor);
 
-extern  JVOID   JChartChartPosSet(JChart *pThis, JINT left, JINT top, JINT right, JINT bottom);
-extern  JVOID 	JChartChartDraw(JChart *pThis);
-extern  JVOID 	JChartChartClear(JChart *pThis);
+extern  JBOOL JChartLabelXDrawEx(JChart *pThis, char *strStart, char *strCenter, char *strEnd);
 
-extern  JVOID   JChartAxisXSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax);
-extern  JVOID   JChartAxisXSet2(JChart *pThis, JFLOAT fMax, JFLOAT fWidth);
-extern  JVOID   JChartAxisXSetMax(JChart *pThis, JFLOAT fMax);
-extern  JVOID   JChartAxisYSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax);	
+extern  void  JChartChartPosSet(JChart *pThis, JINT left, JINT top, JINT right, JINT bottom);
+extern  void 	JChartChartDraw(JChart *pThis);
+extern  void 	JChartChartClear(JChart *pThis);
 
-extern  JVOID 	JChartDrawLabelEx(JChart *pThis, JFLOAT fValX, JINT xOff, JINT yOff , char * label);
-extern  JVOID   JChartDrawDotLine(JChart *pThis, JINT startX0, JINT endX1);
+extern  void  JChartAxisXSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax);
+extern  void  JChartAxisXSet2(JChart *pThis, JFLOAT fMax, JFLOAT fWidth);
+extern  void  JChartAxisXSetMax(JChart *pThis, JFLOAT fMax);
+extern  void  JChartAxisYSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax);	
 
-extern  JBOOL   JChartLineDotYDraw(JChart *pThis, JINT x0Idx);
-extern  void    JChartCursorXYDraw(JChart *pThis);
 
-extern  JVOID   JChartCanvasPosSet(JChart *pThis, JINT left, JINT top, JINT width, JINT height);	
-extern  JVOID 	JChartCanvasDraw(JChart *pThis);
+extern  void 	JChartDrawLabelEx(JChart *pThis, JFLOAT fValX, JINT xOff, JINT yOff , char * label);
+extern  void  JChartDrawDotLine(JChart *pThis, JINT startX0, JINT endX1);
 
-extern JVOID 	JChartInfoPrint(JChart *pThis);
+
+extern  JBOOL JChartLineDotYDraw(JChart *pThis, JINT x0Idx);
+extern  void  JChartCursorXYDraw(JChart *pThis);
+
+extern  void  JChartCanvasPosSet(JChart *pThis, JINT left, JINT top, JINT width, JINT height);	
+extern  void 	JChartCanvasDraw(JChart *pThis);
+
+extern 	JBOOL	JChartXValToXPos(JChart *pThis,JFLOAT fXVal, JINT *piXPOS);
+extern 	void 	JChartTriangleDraw(JChart *pThis, JINT left, JINT top, JINT w, JINT h, JDWORD dwColor);
+
+extern 	void 	JChartInfoPrint(JChart *pThis);
 
 #endif ///< __JCHART_H__
 

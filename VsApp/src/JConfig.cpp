@@ -21,10 +21,11 @@ ConfigItemType ConfigItem[] =
 		{CONFIG_ITEM_TIME_ZONE_SEC,  		"28800", 									JCONFIG_TYPE_INT},				
 		{CONFIG_ITEM_COM_PORT, 					"COM7", 									JCONFIG_TYPE_STR},		
 		{CONFIG_ITEM_SERIAL_PORT, 			"/dev/ttyUSB0", 					JCONFIG_TYPE_STR},				
-		{CONFIG_ITEM_SSN,  							"11-222-3333", 						JCONFIG_TYPE_STR},									
+		{CONFIG_ITEM_SSN,  							"000-00-0000", 						JCONFIG_TYPE_STR},									
 		{CONFIG_ITEM_DATA_ROOT,   			"./data", 								JCONFIG_TYPE_STR},					
 		{CONFIG_ITEM_BLE_DEVICE_NAME, 	"", 											JCONFIG_TYPE_STR},							
 		{CONFIG_ITEM_BLE_DEVICE_MAC,  	"", 											JCONFIG_TYPE_STR},			
+	  {CONFIG_ITEM_VSC_MODE_SAVE, 	 	"ON", 										JCONFIG_TYPE_STR},	
 		///------------------------------------------------------------------------------------///
 		{"", "", JCONFIG_TYPE_STR},			
 };
@@ -230,20 +231,33 @@ void ConfigParse(char *strLine)
 void ConfigLoad(void)
 {
 	FILE *fp = NULL;
-	char fileName[256];
+	char strFileName[256];
 	char line[256];
 	JINT iRet = 0;
 
 	#if OS_TYPE == OS_TYPE_UBUNTU
-	sprintf(fileName, "./data/config.txt");
+	sprintf(strFileName, "./data/config.txt");
 	#elif OS_TYPE == OS_TYPE_MAC_OS
-	sprintf(fileName, "./data/config.mac.txt");
+	sprintf(strFileName, "./data/config.mac.txt");
 	#elif OS_TYPE == OS_TYPE_WINDOWS
-	sprintf(fileName, "./data/config.win.txt");
+	sprintf(strFileName, "./data/config.win.txt");
 	#endif ///< for #if
 
-	UtilWinPathNameSet(fileName);
-	fp = fopen(fileName, "r");
+
+	if(GlobalVar.iOSType == OS_TYPE_MAC_OS)
+	{
+		if(UtilFileExisted(strFileName) == FALSE)
+		{			
+			sprintf(strFileName, "/Users/Shared/VsEcg/data/config.mac.txt");
+		}
+		if(UtilFileExisted(strFileName) == FALSE)
+		{
+			sprintf(strFileName, "./data/config.mac.txt");			
+		}
+	}
+	
+	UtilWinPathNameSet(strFileName);
+	fp  = fopen(strFileName, "r");
 	if(fp == NULL)
 	{
 		ConfigSave();
@@ -270,18 +284,32 @@ void ConfigSave(void)
 	JINT i = 0;
   ConfigItemType *pItem = NULL;
   FILE * fp = NULL;
-  char fileName[256];  
+  char strFileName[256];  
 	
 	/// Log save
 	#if OS_TYPE == OS_TYPE_UBUNTU
-	sprintf(fileName, "./data/config.txt");
+	sprintf(strFileName, "./data/config.txt");
 	#elif OS_TYPE == OS_TYPE_MAC_OS
-	sprintf(fileName, "./data/config.mac.txt");
+	sprintf(strFileName, "./data/config.mac.txt");
 	#elif OS_TYPE == OS_TYPE_WINDOWS
-	sprintf(fileName, "./data/config.win.txt");	
-	#endif
-	UtilWinPathNameSet(fileName);
-  fp = fopen(fileName, "w+");
+	sprintf(strFileName, "./data/config.win.txt");
+	#endif ///< for #if
+
+
+	if(GlobalVar.iOSType == OS_TYPE_MAC_OS)
+	{
+		if(UtilFileExisted(strFileName) == FALSE)
+		{
+			sprintf(strFileName, "/Users/Shared/VsEcg/data/config.mac.txt");
+		}
+		if(UtilFileExisted(strFileName) == FALSE)
+		{
+			sprintf(strFileName, "./data/config.mac.txt");
+		}
+	}
+
+	UtilWinPathNameSet(strFileName);
+  fp = fopen(strFileName, "w+");
   if(fp == NULL)
 	{
 		DBG_PRINTF("Failed to open the config file\r\n");
@@ -300,5 +328,7 @@ void ConfigSave(void)
  	}
 	fclose(fp);
 	
-	//ConfigPrint();	
+	//ConfigPrint();
+	DBG_PRINTF("Config file saved\r\n");
 }
+

@@ -1,5 +1,5 @@
 /**
- * @file app.cpp
+ * @file App.cpp
  *
  *  APP function 
  *
@@ -27,7 +27,7 @@ void CallbackWindowDestroy(GtkWidget *widget, GdkEvent *event, gpointer data)
  	GlobalVar.bAppExit = TRUE;    
 }
 
-static void CallbackMenuItemMain(GtkWidget *widget, GdkEvent *event, gpointer data)
+static void CallbackMenuItemFile(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	AppActiveViewSet(&JVForm1);
 }
@@ -35,6 +35,21 @@ static void CallbackMenuItemMain(GtkWidget *widget, GdkEvent *event, gpointer da
 static void CallbackMenuItemConfig(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	AppActiveViewSet(&JVForm2);
+}
+
+static void CallbackMenuItemBle(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	AppActiveViewSet(&JVForm3);
+}
+
+static void CallbackMenuItemView(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	AppActiveViewSet(&JVForm4);
+}
+
+static void CallbackMenuItemDevice(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	AppActiveViewSet(&JVForm6);
 }
 
 static void CallbackMenuItemClose(GtkWidget *widget, GdkEvent *event, gpointer data)
@@ -120,42 +135,58 @@ void AppMainMenuSet(GtkWidget *pView)
 	///  menu
 	///-----------------------------------------------------------------------///	
 	GtkWidget * pMenubar  = NULL; 
-	GtkWidget * pMenuFile = NULL;
+	GtkWidget * pMenuRoot1 = NULL;
 
 /// Manu Item Root
-	GtkWidget * pMenuItemRootVsApp	 = NULL;
+	GtkWidget * pMenuItemSubMenuVsApp	 = NULL;
 
   /// Manu Item
-  GtkWidget * pMenuItemMain    	 = NULL;
-  GtkWidget * pMenuItemControl   = NULL;
-	GtkWidget * pMenuItemClose  	 = NULL;
+  GtkWidget * pMenuItemFile   	  = NULL;
+  GtkWidget * pMenuItemControl    = NULL;
+  GtkWidget * pMenuItemBle        = NULL;
+  GtkWidget * pMenuItemView       = NULL;
+  GtkWidget * pMenuItemDevice     = NULL;  
+	GtkWidget * pMenuItemClose  	  = NULL;
   
+  JINT w = 80;
+  JINT h = 30;
 	
 	
- 	pMenubar  = gtk_menu_bar_new();
-  pMenuFile = gtk_menu_new();
+ 	pMenubar    = gtk_menu_bar_new();
+  pMenuRoot1  = gtk_menu_new();
 
 
-  pMenuItemRootVsApp  = gtk_menu_item_new_with_label("VS-APP");     
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(pMenuItemRootVsApp), pMenuFile);
+  pMenuItemSubMenuVsApp  = gtk_menu_item_new_with_label("VS-APP");     
 
-  pMenuItemMain				= gtk_menu_item_new_with_label("Main");
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(pMenuItemSubMenuVsApp), pMenuRoot1);
+
+  pMenuItemFile				= gtk_menu_item_new_with_label("File");
   pMenuItemControl		= gtk_menu_item_new_with_label("Control");
+  pMenuItemBle   		  = gtk_menu_item_new_with_label("BLE");  
+  pMenuItemView   	  = gtk_menu_item_new_with_label("View");  
+  pMenuItemDevice  	  = gtk_menu_item_new_with_label("Device");    
   pMenuItemClose 			= gtk_menu_item_new_with_label("Close");
   
-  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemMain);  
-  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemControl);  
-	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuFile), pMenuItemClose);
-
-  g_signal_connect(G_OBJECT(pMenuItemMain),  	  "activate",   G_CALLBACK(CallbackMenuItemMain), 	  NULL);
+  g_signal_connect(G_OBJECT(pMenuItemFile),  	  "activate",   G_CALLBACK(CallbackMenuItemFile), 	  NULL);
   g_signal_connect(G_OBJECT(pMenuItemControl),  "activate",   G_CALLBACK(CallbackMenuItemConfig), 	NULL);
+  g_signal_connect(G_OBJECT(pMenuItemBle),      "activate",   G_CALLBACK(CallbackMenuItemBle), 	    NULL);  
+  g_signal_connect(G_OBJECT(pMenuItemView),     "activate",   G_CALLBACK(CallbackMenuItemView), 	  NULL);  
+  g_signal_connect(G_OBJECT(pMenuItemDevice),   "activate",   G_CALLBACK(CallbackMenuItemDevice),   NULL);    
 	g_signal_connect(G_OBJECT(pMenuItemClose),  	"activate",   G_CALLBACK(CallbackMenuItemClose), 	  NULL);
 
-	/// increase the menu width
-  gtk_widget_set_size_request(pMenuItemRootVsApp, 80, 30); 
-  
-  gtk_menu_shell_append(GTK_MENU_SHELL(pMenubar), pMenuItemRootVsApp);
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuRoot1), pMenuItemFile);  
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuRoot1), pMenuItemControl);  
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuRoot1), pMenuItemBle);    
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuRoot1), pMenuItemView);    
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenuRoot1), pMenuItemDevice);   
+	gtk_menu_shell_append(GTK_MENU_SHELL(pMenuRoot1), pMenuItemClose);
 
+	/// increase the menu width
+  gtk_widget_set_size_request(pMenuItemSubMenuVsApp, w, h); 
+  
+  /// apend sub-menu to menu-bar
+  gtk_menu_shell_append(GTK_MENU_SHELL(pMenubar), pMenuItemSubMenuVsApp);
+  
   gtk_container_add(GTK_CONTAINER(pView), pMenubar);
   gtk_widget_show_all(pMenubar);
 }
@@ -184,6 +215,10 @@ void AppInit(void)
   ///-------------------------------------------------------///
   AppPtr->pViewArr[0] = &JVForm1;
   AppPtr->pViewArr[1] = &JVForm2;  
+  AppPtr->pViewArr[2] = &JVForm3;  
+  AppPtr->pViewArr[3] = &JVForm4;  
+  AppPtr->pViewArr[4] = &JVForm5;
+  AppPtr->pViewArr[5] = &JVForm6;
 
   for(i = 0 ; i < JVIEW_CNT; i = i + 1)
 	{

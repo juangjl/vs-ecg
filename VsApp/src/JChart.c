@@ -25,7 +25,7 @@
 #define JCHART_MAX_X_VAL											(6 * 1000) ///< 6 sec  = 6000 ms
 #define JCHART_MAX_Y_VAL											(6)
 
-JVOID 	JChartInit(JChart *pThis)
+void 	JChartInit(JChart *pThis)
 {
 	pThis->fLineWidth			= 0.5;
 	pThis->colorCanvasBg 	= JCHART_COLOR_CANVAS_BACKGROUND;
@@ -76,33 +76,50 @@ JVOID 	JChartInit(JChart *pThis)
 	pThis->fYValFixRange = (pThis->iRow * 0.1); ///< 6 mV
 }
 
+JBOOL 	JChartXValToXPos(JChart *pThis, JFLOAT fXVal, JINT *piXPOS)
+{
+	JFLOAT fVal = 0;
+	JINT iXPos = 0;
+	fVal = fXVal  * 1000;
+	fVal = (fVal - pThis->fXValMin) ;
+	if(fVal < 0)
+	{
+		fVal = 0;
+	}
+
+	iXPos = (fVal - pThis->fXValMin) * 	pThis->iChartWidth / (pThis->fXValWidth) + 	pThis->iChartX0;
+	*piXPOS = iXPos;
+
+	return TRUE;
+}
+
 void 	JChartSampleRateSet(JChart *pThis, JFLOAT fSampleRate)
 {	
 	pThis->fSampleRate = fSampleRate;
 }
 
-JVOID 	JChartReset(JChart *pThis)
+void 	JChartReset(JChart *pThis)
 {
 	pThis->iDataCnt = -1;
 }
 
-JVOID		JChartCellSet(JChart *pThis, JINT iRow, JINT iCol)
+void		JChartCellSet(JChart *pThis, JINT iRow, JINT iCol)
 {
 	pThis->iRow = iRow;
 	pThis->iCol = iCol;
 }
 
-JVOID 	JChartModeSet(JChart *pThis, JDWORD dwChartMode)
+void 	JChartModeSet(JChart *pThis, JDWORD dwChartMode)
 {
 	pThis->dwChartMode |= dwChartMode;
 }
 
-JVOID 	JChartModeClear(JChart *pThis, JDWORD dwChartMode)
+void 	JChartModeClear(JChart *pThis, JDWORD dwChartMode)
 {
 	pThis->dwChartMode &= ~dwChartMode;
 }
 
-JVOID 	JChartGridDraw(JChart *pThis)
+void 	JChartGridDraw(JChart *pThis)
 {
 	JINT i  = 0;
 	
@@ -273,6 +290,7 @@ JINT 	JChartLineEcgDraw(JChart *pThis)
 	{
 		pThis->fYValMax = pDataStat->fYMax;
 		pThis->fYValMin = pDataStat->fYMin;
+		pThis->fYValAvg = pDataStat->fYAvg;
 
 		fHighAmp = (pDataStat->fYMax - pDataStat->fYAvg);
 		fLowAmp  = (pDataStat->fYAvg - pDataStat->fYMin);
@@ -292,24 +310,26 @@ JINT 	JChartLineEcgDraw(JChart *pThis)
 	{
 		pThis->fYValMax = pDataStat->fYMax;
 		pThis->fYValMin = pDataStat->fYMin;
+		pThis->fYValAvg = pDataStat->fYAvg;
 
-		if((pDataStat->fYMax  < fEcgAmpHalf) && (pDataStat->fYMin > (fEcgAmpHalf * -1)))
+		fHighAmp = (pThis->fYValMax  - pThis->fYValMax);
+		fLowAmp  = (pDataStat->fYAvg - pThis->fYValMin);
+
+		if((fHighAmp < fEcgAmpHalf) && (fLowAmp < fEcgAmpHalf))
 		{
-			pThis->fYValFixedMax = fEcgAmpHalf;
-			pThis->fYValFixedMin = (fEcgAmpHalf * -1);
+			pThis->fYValFixedMax = fEcgAmpHalf + pThis->fYValAvg ;
+			pThis->fYValFixedMin = pThis->fYValAvg - fEcgAmpHalf;
 		}
 		else
 		{
-			;
-			pThis->fYValFixedMax = (JFLOAT) ((JINT)(pDataSet->data[pDataSet->cnt - 1] * 10 + 10 ) - (JINT)((pDataSet->data[pDataSet->cnt - 1]  * 10 )) % 10) / 10.0;
-			pThis->fYValFixedMin = 	pThis->fYValFixedMax  - pThis->fYValFixRange;
+			pThis->fYValFixedMax = fEcgAmpHalf + pThis->fYValAvg ;
+			pThis->fYValFixedMin = pThis->fYValAvg - fEcgAmpHalf;
 		}
-		
-		
+				
 		pThis->fYValMax = pThis->fYValFixedMax;
 		pThis->fYValMin = pThis->fYValFixedMin;			 	
 	}
-  
+	
 	pThis->fYValAmp = pThis->fYValMax  - pThis->fYValMin ;
 
 	if((pThis->fYValMax  != pThis->fYValMaxPre) ||
@@ -333,7 +353,8 @@ JINT 	JChartLineEcgDraw(JChart *pThis)
 	/// Draw Line
 	///--------------------------------------------///			
 	pThis->iLineCnt = 0;	
-	pDC->ForegroundColorSet(pThis->colorLine);	
+	pDC->ForegroundColorSet(pThis->colorLine);
+	//pDC->LineWidth(pThis->fLineWidth);	
 	pDC->LineWidth(1);	
 	for(i = iMinX ; i < (int)iDataCount; i ++)
 	{
@@ -383,7 +404,7 @@ JINT 	JChartLineEcgDraw(JChart *pThis)
 
 
 	pDC->PathDraw(fArrX, fArrY, iTotalCnt);
-	free(fArrX);
+	free(fArrX);	
 	free(fArrY);	
 	
 	pThis->iDataCnt = pDataSet->cnt;
@@ -794,22 +815,22 @@ JINT 	JChartLineTimeDraw(JChart *pThis)
 	return TRUE;
 }
 
-JVOID   JChartLineXYDraw(JChart *pThis)
+void   JChartLineXYDraw(JChart *pThis)
 {
 
 }
 
-JVOID 	JChartBarDraw(JChart *pThis)
+void 	JChartBarDraw(JChart *pThis)
 {
 
 }
 
-JVOID   JChartCursorDraw(JChart *pThis)
+void   JChartCursorDraw(JChart *pThis)
 {
 	JDraw *pDC = pThis->pDC;
 }
 
-JVOID		JChartInfoDraw(JChart *pThis)
+void		JChartInfoDraw(JChart *pThis)
 {
 
 }
@@ -999,7 +1020,6 @@ JBOOL	 	JChartLabelYDraw(JChart *pThis)
 	pDC->ForegroundColorSet(pThis->colorXLabel);
 	pDC->TextOut(x0, y0, strLabel);
 
-
 	///----------------------------//
 	/// End label (max)
 	///----------------------------//	
@@ -1018,12 +1038,19 @@ JBOOL	 	JChartLabelYDraw(JChart *pThis)
 	return TRUE;	
 }
 
-JBOOL 	JChartLabelDraw(JChart *pThis)
+JBOOL	 	JChartLabelDraw(JChart *pThis, char * strLabel, JINT x, JINT y, JDWORD dwColor)
 {
+	JDraw *pDC = pThis->pDC;	
+	JINT x0 = x;
+	JINT y0 = y;
+
+	pDC->ForegroundColorSet(dwColor);
+	pDC->TextOut(x0, y0, strLabel);
+
 	return TRUE;
 }
 
-JVOID 	JChartChartDraw(JChart *pThis)
+void 	JChartChartDraw(JChart *pThis)
 {	
 	/// Draw line
 	JChartLineEcgDraw(pThis);
@@ -1032,7 +1059,7 @@ JVOID 	JChartChartDraw(JChart *pThis)
 	JChartLabelYDraw(pThis);	  
 }
 
-JVOID JChartChartClear(JChart *pThis)
+void JChartChartClear(JChart *pThis)
 {
 	JDraw *pDC = pThis->pDC;
 
@@ -1041,7 +1068,7 @@ JVOID JChartChartClear(JChart *pThis)
 	pDC->RectFill(pThis->iChartX0, pThis->iChartY0, pThis->iChartWidth, pThis->iChartHeight);
 }
 
-JVOID 	JChartCanvasDraw(JChart *pThis)
+void 	JChartCanvasDraw(JChart *pThis)
 {	
 	JDraw *pDC = pThis->pDC;
 	
@@ -1053,7 +1080,7 @@ JVOID 	JChartCanvasDraw(JChart *pThis)
 	pDC->RectFill(pThis->iChartX0, pThis->iChartY0, pThis->iChartWidth, pThis->iChartHeight);
 }
 
-JVOID   JChartAxisXSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax)
+void   JChartAxisXSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax)
 {
 	pThis->fXValMin = fMin;
 	pThis->fXValMax = fMax;	
@@ -1070,7 +1097,7 @@ JVOID   JChartAxisXSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax)
 	pThis->fXValWidth =  pThis->fXValMax  - pThis->fXValMin ;
 }
 
-JVOID  JChartAxisXSet2(JChart *pThis, JFLOAT fMax, JFLOAT fWidth)
+void  JChartAxisXSet2(JChart *pThis, JFLOAT fMax, JFLOAT fWidth)
 {
 	pThis->fXValMin = fMax - fWidth ;
 	pThis->fXValMax = fMax;	
@@ -1090,10 +1117,9 @@ JVOID  JChartAxisXSet2(JChart *pThis, JFLOAT fMax, JFLOAT fWidth)
 	}
 
 	pThis->fXValWidth =  fWidth;
-
 }
 
-JVOID   JChartAxisXSetMax(JChart *pThis, JFLOAT fMax)
+void   JChartAxisXSetMax(JChart *pThis, JFLOAT fMax)
 {
 	pThis->fXValMin = fMax - pThis->fXValWidth  ;
 	pThis->fXValMax = fMax;	
@@ -1114,7 +1140,7 @@ JVOID   JChartAxisXSetMax(JChart *pThis, JFLOAT fMax)
 	}
 }
 
-JVOID   JChartAxisYSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax)
+void   JChartAxisYSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax)
 {
 	pThis->fYValMin = fMin;
 	pThis->fYValMax = fMax;	
@@ -1125,7 +1151,7 @@ JVOID   JChartAxisYSet(JChart *pThis, JFLOAT fMin, JFLOAT fMax)
 	pThis->fYValAmp =  fMax - fMin;
 }
 
-JVOID   JChartCanvasPosSet(JChart *pThis, JINT left, JINT top, JINT width, JINT height)
+void   JChartCanvasPosSet(JChart *pThis, JINT left, JINT top, JINT width, JINT height)
 {
 	pThis->iCanvasLeft		 	= left;
 	pThis->iCanvasTop 			= top;
@@ -1133,7 +1159,7 @@ JVOID   JChartCanvasPosSet(JChart *pThis, JINT left, JINT top, JINT width, JINT 
 	pThis->iCanvasHeight    = height;	
 }
 
-JVOID   JChartChartPosSet(JChart *pThis, JINT left, JINT top, JINT right, JINT bottom)
+void   JChartChartPosSet(JChart *pThis, JINT left, JINT top, JINT right, JINT bottom)
 {
 	JINT iCellWidth  = 0;
 	JINT iCellHeight = 0;		
@@ -1261,7 +1287,7 @@ JBOOL JChartLineDotYDraw(JChart *pThis, JINT x0Idx)
   return TRUE;
 }
 
-JVOID JChartDrawDotLine(JChart *pThis, JINT startX0, JINT endX1)
+void JChartDrawDotLine(JChart *pThis, JINT startX0, JINT endX1)
 {
 	JDataSet  *pDataSet   = pThis->pDataSet;	
 	JINT  x0Idx        		= startX0 / (1000/  pThis->fSampleRate);
@@ -1370,7 +1396,7 @@ JVOID JChartDrawDotLine(JChart *pThis, JINT startX0, JINT endX1)
 
 }
 
-JVOID 	JChartDrawLabelEx(JChart *pThis, JFLOAT fValX, JINT xOff, JINT yOff , char * label)
+void 	JChartDrawLabelEx(JChart *pThis, JFLOAT fValX, JINT xOff, JINT yOff , char * label)
 {
 	JDataSet  *pDataSet   = pThis->pDataSet;	
 	JINT  xIdx        		= fValX / (1000/  pThis->fSampleRate);
@@ -1479,7 +1505,7 @@ JVOID 	JChartDrawLabelEx(JChart *pThis, JFLOAT fValX, JINT xOff, JINT yOff , cha
   }
 }
 
-JVOID 	JChartDataSet(JChart *pThis, JDataSet *pDataSet)
+void 	JChartDataSet(JChart *pThis, JDataSet *pDataSet)
 {
 	pThis->pDataSet = pDataSet;
 }
@@ -1554,23 +1580,41 @@ JBOOL JChartStatCalculate(JChart *pThis, JDataStat *pDataStat)
 	return TRUE;
 }
 
-JVOID 	JChartInfoPrint(JChart *pThis)
+void 	JChartInfoPrint(JChart *pThis)
 {	
 	printf("%s", "---------------------------------------------------------------------\r\n");
 	if(pThis->pDataSet != NULL)
 	{
-		printf("\t(CNT, IDX) 	  = (%d, %d)\r\n",  			pThis->pDataSet->cnt,  	pThis->pDataSet->idx);	
+		printf("\t(CNT, IDX) = (%d, %d)\r\n",  			pThis->pDataSet->cnt,  	pThis->pDataSet->idx);	
 	}
-	printf("\t(CHART_LEFT, CHART_TOP) 	  = (%d, %d)\r\n",  			pThis->iChartLeft,  pThis->iChartTop);	
-	printf("\t(ROW, CELL) 	  = (%d, %d)\r\n",  			pThis->iRow,  pThis->iCol);	
+	printf("\t(CHART_LEFT, CHART_TOP) = (%d, %d)\r\n",  			pThis->iChartLeft,  pThis->iChartTop);	
+	printf("\t(ROW, CELL) = (%d, %d)\r\n",  			pThis->iRow,  pThis->iCol);	
 	printf("\t(CHART_WIDTH, CHART_HEIGHT) = (%d, %d)\r\n",  			pThis->iChartWidth,  pThis->iChartHeight);	
 	printf("\t(X_VAL_MIN, X_VAL_MAX, X_VAL_WIDTH) = (%0.3f, %0.3f, %0.3f)\r\n",  pThis->fXValMin, pThis->fXValMax, pThis->fXValWidth);	
 	printf("\t(Y_VAL_MIN, Y_VAL_MAX) = (%0.3f, %0.3f)\r\n",  pThis->fYValMin, pThis->fYValMax);	
 	printf("\t(Y_FIXED_MIN, Y_FIXED_MAX, Y_FIXED_RANGE) = (%0.3f, %0.3f, %0.3f)\r\n\r\n",  pThis->fYValFixedMin, pThis->fYValFixedMax, pThis->fYValFixRange);		
 }
 
+void 	JChartTriangleDraw(JChart *pThis, JINT left, JINT top, JINT w, JINT h, JDWORD dwColor)
+{
+	JDraw *pDC = pThis->pDC;
+	JDOUBLE x[3];
+	JDOUBLE y[3];	
+	
+	x[0] = left;
+	y[0] = top;
 
-JVOID 	JChartDCSet(JChart *pThis, JDraw *pDC)
+	x[1] = left - (w / 2);
+	y[1] = top  - (h);
+
+	x[2] = left + (w / 2);
+	y[2] = top  - h;
+
+	pDC->ForegroundColorSet(dwColor);
+	pDC->TriangleFill(x, y);
+}
+
+void 	JChartDCSet(JChart *pThis, JDraw *pDC)
 {
 	pThis->pDC = pDC;
 }

@@ -85,21 +85,17 @@ void BleState(void)
 		if((GlobalVar.dwSysCtl2 & SYS_CTL2_SEC_EVT) != 0)
 		{
 			GlobalVar.dwVscModeSec = 	GlobalVar.dwVscModeSec + 1;
-		}
-
-		if((GlobalVar.dwSysCtl2 & SYS_CTL2_TIMER_20MS_EVT) != 0)
-		{
-			if(GlobalVar.tid0 == NULL)
+		}					
+		if(GlobalVar.tid0 == NULL)
+		{			
+			JINT iErr = 0;
+			iErr = pthread_create(&GlobalVar.tid0, NULL, &ThreadVscMode, NULL);
+			if(iErr != 0)
 			{
-				JINT iErr = 0;
-				iErr = pthread_create(&GlobalVar.tid0, NULL, &ThreadVscMode, NULL);
-				if(iErr != 0)
-				{
-					printf("can't create thread :[%s]\r\n", strerror(iErr));
-				}
-				pthread_detach(GlobalVar.tid0);
+				printf("can't create thread :[%s]\r\n", strerror(iErr));
 			}
-		}
+			pthread_detach(GlobalVar.tid0);							
+		}									
 	}
 
 	///---------------------------------------------------------///

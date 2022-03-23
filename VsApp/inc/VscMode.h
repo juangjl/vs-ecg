@@ -67,8 +67,16 @@ typedef struct VscModeControlSt
 {
 	JWORD 	wId;
 	JDWORD 	dwPacketCnt;
-	JINT 		iChannelCount;
-	char 		strBaseFolder[256];
+	JINT 		iChannelCount;	
+	
+	JINT		iTimeBase;
+	
+	///------------------------------------------------///
+	/// File related function
+	///------------------------------------------------///
+	char 		strBaseFolder[256];			///<  YYMMDD_HHmmSS
+	char 		strDateFolder[256];			///<	YYMMDD
+	char 		strHourFolder[256];			///<	00,01 ... 23	
 	char 		strFileNameInfo[512];
 	char 		strFileNameGSensor[512];
 	char 		strFileNameData[VSC_MODE_CAHNNEL_COUNT][512];
@@ -112,6 +120,8 @@ typedef struct VscModeControlSt
 
 extern VscModeControlType VscMode;
 
+extern void VscModeFileNameSet(VscModeControlType *pVscMode);
+extern void VscModeSave(VscModeControlType *pVscMode);
 extern void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData);
 extern void VscModeInit(char *pBaseFolder);
 

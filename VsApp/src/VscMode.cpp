@@ -5,7 +5,7 @@
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
- * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd.,, all rights reserved.
+ * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  * @note
 */
 ///------------------------------------------///
@@ -139,6 +139,7 @@ void VscModeInfoParse(VscModeControlType *pVscMode)
 	{
 		pVscMode->fHrvLFHF = (pVscMode->fHrvLF / pVscMode->fHrvHF);
 	}
+
 	JTMLocalTimeGet(&pVscMode->jtm, 	pVscMode->dwUTC);
 	pVscMode->jtm.iMS = ( pItem->wId % 5) * 200;	
 }
@@ -234,12 +235,11 @@ void VscModeInfoSave(VscModeControlType *pVscMode)
 	{
 		bHeaderGen = TRUE;
 	}
-
 	
 	fp  = fopen(pVscMode->strFileNameInfo, "a+");
 	if(fp == NULL)
 	{
-		sprintf(msg, "\t\t [VSC][ERROR] Failed to open '%s'\r\n", VscMode.strFileNameInfo);
+		sprintf(msg, "\t\t [VSC][ERROR][INFO] Failed to open %s\r\n", VscMode.strFileNameInfo);
 		DBG_PRINTF(msg);		
 		return;
 	}
@@ -350,7 +350,7 @@ void VscModeGSensorDataSave(VscModeControlType *pVscMode)
 	}
 	if(fp == NULL)
 	{
-		sprintf(msg, "\t\t [VSC][ERROR] Failed to open %s\r\n", VscMode.strFileNameGSensor);
+		sprintf(msg, "\t\t [VSC][ERROR][GSENSOR] Failed to open %s\r\n", VscMode.strFileNameGSensor);
 		DBG_PRINTF(msg);		
 		return;
 	}
@@ -361,7 +361,7 @@ void VscModeGSensorDataSave(VscModeControlType *pVscMode)
 	fclose(fp);
 }
 
-void VscModeDataParse(VscModeControlType *pVscMode)
+void VscModeEcgDataParse(VscModeControlType *pVscMode)
 {
 	JINT i = 0;
 	JINT iCH = 0;
@@ -386,7 +386,68 @@ void VscModeDataParse(VscModeControlType *pVscMode)
 	}
 }
 
-void VscModeDataSave(VscModeControlType *pVscMode)
+void VscModeFileNameSet(VscModeControlType *pVscMode)
+{
+	JINT i = 0;
+	char strFileName[256];
+	FILE *fp = NULL;
+
+	///----------------------------------------------------------------------///
+	/// 1. Date folder Set
+	///----------------------------------------------------------------------///
+	sprintf((char *)&pVscMode->strDateFolder[0], "%s/%04d%02d%02d", 
+										pVscMode->strBaseFolder,
+										pVscMode->jtm.iYear,
+										pVscMode->jtm.iMonth,
+										pVscMode->jtm.iDay);
+
+	if(UtilFolderExisted(pVscMode->strDateFolder) == FALSE)
+	{
+		UtilFolderCreate(pVscMode->strDateFolder);
+	}
+
+	///----------------------------------------------------------------------///
+	/// 2. Hour folder Set
+	///----------------------------------------------------------------------///
+	sprintf((char *)&pVscMode->strHourFolder[0], "%s/%02d", 
+										pVscMode->strDateFolder,
+										pVscMode->jtm.iHour);
+
+	if(UtilFolderExisted(pVscMode->strHourFolder) == FALSE)
+	{
+		UtilFolderCreate(pVscMode->strHourFolder);
+	}
+
+	///----------------------------------------------------------------------///
+	/// 3. Set ECG Data
+	///----------------------------------------------------------------------///
+	for(i = 0 ; i < pVscMode->iChannelCount; i = i + 1)
+	{	
+		sprintf((char *)&strFileName[0], "%s/ch%d.reso", pVscMode->strHourFolder, i);
+		if(UtilFileExisted(strFileName) == FALSE)
+		{
+			fp = fopen(strFileName, "w+");
+			if(fp != NULL)
+			{
+				fprintf(fp, "%0.3f", 1.0);
+				fclose(fp);
+			}
+		}
+		sprintf((char *)&pVscMode->strFileNameData[i][0], "%s/ch%d.csv", pVscMode->strHourFolder, i);		
+	}
+
+	///----------------------------------------------------------------------///
+	/// 4. Set Info data
+	///----------------------------------------------------------------------///
+	sprintf((char *)&pVscMode->strFileNameInfo[0], "%s/info.csv", pVscMode->strHourFolder);	
+
+	///----------------------------------------------------------------------///
+	/// 5. Set GSensor data
+	///----------------------------------------------------------------------///
+	sprintf((char *)&pVscMode->strFileNameGSensor[0], "%s/gsen.csv", pVscMode->strHourFolder);	
+}
+
+void VscModeEcgDataSave(VscModeControlType *pVscMode)
 {
 	FILE *fp  = NULL;
 	JINT 	i   = 0;	
@@ -394,14 +455,14 @@ void VscModeDataSave(VscModeControlType *pVscMode)
 	JINT iCnt = 0;
 	char 	msg[256];
 
-	iCnt = (VSC_MODE_ITEM_DATA_SIZE / sizeof(JFLOAT) ) / VscMode.iChannelCount;
+	iCnt = (VSC_MODE_ITEM_DATA_SIZE / sizeof(JFLOAT)) / VscMode.iChannelCount;
 
 	for(iCH = 0 ; iCH< pVscMode->iChannelCount; iCH = iCH + 1)
 	{
 		fp = fopen (pVscMode->strFileNameData[iCH], "a+");
 		if(fp == NULL)
 		{
-			sprintf(msg, "\t\t [VSC][ERROR] Failed to open %s\r\n", VscMode.strFileNameData[iCH]);
+			sprintf(msg, "\t\t [VSC][ERROR][ECG][%02d] Failed to open '%s'\r\n", iCH, (char *) &pVscMode->strFileNameData[iCH]);
 			DBG_PRINTF(msg);		
 			continue;
 		}
@@ -412,6 +473,34 @@ void VscModeDataSave(VscModeControlType *pVscMode)
 		}
 		fclose(fp);		
 	}
+}
+
+void VscModeSave(VscModeControlType *pVscMode)
+{
+	char msg[256];
+	VscModeItemType *pItem = &pVscMode->item;	
+
+	/// File Set
+	VscModeFileNameSet(pVscMode);
+
+	if(strlen(pVscMode->strFileNameInfo) == 0)
+	{
+		sprintf(msg, "[ERROR][!!!!][%d] VscMode->strFileNameInfo = '%s'\r\n",pVscMode->wId,  pVscMode->strFileNameInfo);
+		DBG_PRINTF(msg);
+		return;
+	}
+
+	/// ECG Data Save
+	VscModeEcgDataSave(pVscMode);
+
+	/// GSensor Data Save
+	VscModeGSensorDataSave(pVscMode);
+
+	/// GSensor information
+	if((pItem->wId % 5) == 0)
+	{
+		VscModeInfoSave(pVscMode);
+	}	
 }
 
 void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData)
@@ -428,29 +517,18 @@ void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData)
 
 	pItem->wId = wId;
 	pItem->wLen= wLen;
-	/// Data Copy
+
+	/// Ecg Data Copy
 	UtilMemcpy((JBYTE *)&pItem->bData[0], (JBYTE *)&pbData[0], VSC_MODE_ITEM_DATA_SIZE);
 
-	/// Info Copy
+	/// Info Data Copy
 	UtilMemcpy((JBYTE *)&pItem->fInfo[0], (JBYTE *)&pbData[VSC_MODE_ITEM_DATA_SIZE], VSC_MODE_ITEM_INFO_SIZE);
 
-	/// Info Parse
+	/// Info Data Parse
 	VscModeInfoParse(pVscMode);
 	
-	/// Data Parse
-	VscModeDataParse(pVscMode);
-
-	/// ECG Data Save
-	VscModeDataSave(pVscMode);
-
-	/// GSensor Data Save
-	VscModeGSensorDataSave(pVscMode);
-
-	/// GSensor information
-	if((pItem->wId % 5) == 0)
-	{
-		VscModeInfoSave(pVscMode);
-	}	
+	/// Ecg Data Parse
+	VscModeEcgDataParse(pVscMode);
 	
 	//sprintf(msg, "\t\t [VSC]  ID = %03d, SIZE=%d, IDX = %d\r\n", pItem->wId , pItem->wLen, idx);
 	//DBG_PRINTF(msg);		
@@ -459,45 +537,13 @@ void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData)
 void VscModeInit(char *pBaseFolder)	
 {	
 	JTM jtm;
-	JINT i = 0;
 	time_t t = time(NULL);
-	char strFolderName[256];
-	char strFileName[512];
-	FILE *fp = NULL;
-
-	JTMLocalTimeGet(&jtm, t);
+	JTMLocalTimeGet(&jtm, t);	
 	VscModeControlType *pVscMode = &VscMode;
 
 	pVscMode->wId = 0;
 	pVscMode->iChannelCount = VSC_MODE_CAHNNEL_COUNT; ///< 2 channel
-
-	/// Create 
+	/// set the base folder size 
 	strcpy(pVscMode->strBaseFolder, pBaseFolder);
-
-	//// info file name
-	sprintf((char *)&pVscMode->strFileNameInfo[0], "%s/info.csv", pVscMode->strBaseFolder);
-	printf("\t [VSC] INFO    FILE NAME = %s\r\n", pVscMode->strFileNameInfo);
-
-	//// Gsensor file name
-	sprintf((char *)&pVscMode->strFileNameGSensor[0], "%s/gsen.csv", pVscMode->strBaseFolder);
-	printf("\t [VSC] GSENOR  FILE NAME = %s\r\n", pVscMode->strFileNameGSensor);
-
-	///--------------------------------------------------------------------------///
-	/// ECG file name
-	///--------------------------------------------------------------------------///
-	for(i = 0 ; i < pVscMode->iChannelCount; i = i + 1)
-	{	
-		/// generate resolution file
-		sprintf((char *)&strFileName[0], "%s/ch%d.reso", pVscMode->strBaseFolder, i);
-		fp = fopen(strFileName, "w+");
-		if(fp != NULL)
-		{
-			fprintf(fp, "%0.3f", 1.0);
-			fclose(fp);
-		}
-
-		/// ECG file name
-		sprintf((char *)&pVscMode->strFileNameData[i][0], "%s/ch%d.csv", pVscMode->strBaseFolder, i);
-		printf("\t [VSC] ECG CH%d DATA FILE = %s\r\n", i, pVscMode->strFileNameData[i]);
-	}	
 }
+

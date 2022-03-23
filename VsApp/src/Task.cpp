@@ -19,15 +19,6 @@ void TaskRoundInit(void)
 	TimerEventSet();	
 }
 
-void TaskApp(void)
-{
-	if(gtk_events_pending())
-	{
-		gtk_main_iteration();
-	}
-}
-
-
 void TaskSerialPort(void)
 {
 	char strComName[256];
@@ -64,6 +55,42 @@ void TaskSerialPort(void)
 		GlobalVar.dwSysCtl5 &= ~SYS_CTL5_SERIAL_PORT_CLOSE;
 	}
 }
+
+void TaskBleSReg(void)
+{
+	char msg[256];
+	SRegType *pSReg = &GlobalVar.SReg;
+
+	if(GlobalVar.bSRegOn == FALSE)
+	{
+		return;
+	}
+
+	if((GlobalVar.dwSysSta5 & SYS_STA5_SERIAL_PORT_OPEN) == 0)
+	{
+		sprintf(msg, "%s",  "[SREG] Serial port is closed\r\n");
+		GlobalVar.bSRegOn = FALSE;
+		DBG_PRINTF(msg);
+		return;
+	}
+
+	if(GlobalVar.bSRegWrite == TRUE)
+	{
+		sprintf(msg, "SREG_WRITE -> %s\r\n", pSReg->strName);
+		
+		DBG_PRINTF(msg);
+		SRegWrite(pSReg);
+	}
+	else
+	{		
+		SRegRead(pSReg);		
+		
+		sprintf(msg, "SREG_READ -> %s\r\n", pSReg->strName);
+		DBG_PRINTF(msg);
+	}	
+	GlobalVar.bSRegOn = FALSE;
+}
+
 
 void TaskBleControl(void)
 {
@@ -126,6 +153,14 @@ void TaskBleVscMode(void)
 		pVscMode = &GlobalVar.vscModeArr[GlobalVar.iVscModeArrIdxRead];
 
 		///------------------------------------------------------------------------------------------///
+		///  Save VscMode Data
+		///------------------------------------------------------------------------------------------///
+		if(GlobalVar.bVscModeSave == TRUE)
+		{
+			VscModeSave(pVscMode);		
+		}
+
+		///------------------------------------------------------------------------------------------///
 		///  Chart Data of ECG Set
 		///------------------------------------------------------------------------------------------///
 		JDataSetFIFOAdd(pDS0, (JFLOAT *)&pVscMode->fValueCH[0], VSC_MODE_CAHNNEL_DATA_COUNT, 3000);
@@ -163,4 +198,96 @@ void TaskRoundEnd(void)
 		UtilUsSleep(50);
 	}
 	TimerEventClear();
+}
+
+///------------------------------------------///
+/// MainLoop Start
+///------------------------------------------///
+void MainLoopStart(void)
+{
+	JINT iErr = 0;
+
+	///--------------------------------------------------------------------------------///
+	/// Seperate APP and Function 
+	///--------------------------------------------------------------------------------///
+	iErr = pthread_create(&GlobalVar.tid1, NULL, &ThreadMainLoop, NULL);	
+	if(iErr != 0)
+	{
+		printf("can't create thread :[%s]\r\n", strerror(iErr));
+	}
+	else
+	{		
+		pthread_detach(GlobalVar.tid1);		
+	}
+}
+///------------------------------------------///
+/// SubLoop Start
+///------------------------------------------///
+void SubLoopStart(void)
+{
+	JINT iErr = 0;
+
+	///--------------------------------------------------------------------------------///
+	/// Seperate APP and Function 
+	///--------------------------------------------------------------------------------///
+	iErr = pthread_create(&GlobalVar.tid3, NULL, &ThreadSubLoop, NULL);	
+	if(iErr != 0)
+	{
+		printf("can't create thread :[%s]\r\n", strerror(iErr));
+	}
+	else
+	{		
+		pthread_detach(GlobalVar.tid3);		
+	}
+}
+
+///------------------------------------------///
+/// MainLoop
+///------------------------------------------///
+void MainLoop(void)
+{
+	while(1)
+	{
+		TaskRoundInit();
+				
+		TaskSerialPort();
+
+		TaskBleSReg();
+
+		TaskBleControl();
+
+		TaskBleState();
+
+		TaskBleVscMode();
+
+		TaskRoundEnd();		
+		
+		if(GlobalVar.bAppExit == TRUE)
+		{
+			break;
+		}
+	}
+
+	ConfigSave();
+
+	printf("\r\nbyebye\r\n");
+	return;
+}
+
+///------------------------------------------///
+/// SubLoop
+///------------------------------------------///
+void SubLoop(void)
+{
+	while(1)
+	{		
+		TaskBleVscMode();		
+
+		UtilMsSleep(5);
+
+		if(GlobalVar.bAppExit == TRUE)
+		{
+			break;
+		}							
+	}
 }

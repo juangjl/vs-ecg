@@ -52,5 +52,8 @@ extern JINT CmdSBleVscModeRead(void);
 
 extern JINT CmdSBleMonitorMode(JINT *piMonitorMode);
 
+extern JINT CmdSBleSRegRead(SRegType *pSReg);
+extern JINT CmdSBleSRegWrite(SRegType *pSReg);
+
 #endif ///< for __BLECMD_H__
 

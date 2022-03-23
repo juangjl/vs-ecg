@@ -11,7 +11,7 @@
 #ifndef __APP_H__
 #define __APP_H__ 
 
-#define APP_TITLE										"VS-APP - VitalSigns Technology"
+#define APP_TITLE										"VS-APP (V1.01) - VitalSigns Technology"
 
 #define JVIEW_IDX_FORM1       			(0)
 #define JVIEW_IDX_FORM2       			(1)
@@ -22,7 +22,7 @@
 #define JVIEW_IDX_FORM7       			(6)
 #define JVIEW_IDX_FORM8       			(7)
 
-#define JVIEW_IDX_END		       			(JVIEW_IDX_FORM2)
+#define JVIEW_IDX_END		       			(JVIEW_IDX_FORM6)
 #define JVIEW_CNT  									(JVIEW_IDX_END + 1)
 typedef struct AppST
 {

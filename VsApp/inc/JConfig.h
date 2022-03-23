@@ -30,6 +30,7 @@
 
 #define CONFIG_ITEM_SSN									"SSN"
 #define CONFIG_ITEM_TIME_ZONE_SEC				"TIME_ZONE_SEC"
+#define CONFIG_ITEM_VSC_MODE_SAVE				"VSC_MODE_SAVE"
 
 typedef struct ConfigSt
 {

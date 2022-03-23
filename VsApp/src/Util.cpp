@@ -50,6 +50,23 @@ void DbgPrintf1(char *msg)
 	printf("%s", msg);
 }
 
+void UtilOSTypeGet(JINT *piOSType)
+{		
+	#if OS_TYPE == OS_TYPE_UBUNTU
+	*piOSType= OS_TYPE_UBUNTU;
+	DBG_PRINTF("OS = UBUNTU\r\n");
+	#elif OS_TYPE == OS_TYPE_MAC_OS
+	*piOSType= OS_TYPE_MAC_OS;
+	DBG_PRINTF("OS = MAC\r\n");
+	#elif OS_TYPE == OS_TYPE_WINDOWS
+	*piOSType = OS_TYPE_WINDOWS;
+	DBG_PRINTF("OS = WINDOWS\r\n");
+	#else
+	*piOSType= OS_TYPE_UNKNOWN;
+	DBG_PRINTF("\t OS = UNKNOWN\r\n");
+	#endif ///< for #if
+}
+
 void UtilMemcpy(JBYTE *dst, JBYTE *src, JINT iCnt)
 {
 	JINT i;
@@ -68,12 +85,12 @@ JBOOL UtilMemcmp(JBYTE *dst, JBYTE *src, JINT iCnt)
   {
     if(*dst != *src)
     {
-      return TRUE;
+      return MEMCMP_DIFF;
     }
     dst++;
     src++;
   }
-  return FALSE;
+  return MEMCMP_SAME;
 }
 
 void UtilMemset(JBYTE *dst, JBYTE bVal, JINT iCnt)
