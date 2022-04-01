@@ -194,7 +194,7 @@ void TimerEventClear(void)
 	/// Timer : 100ms  / 10 ms
 	///----------------------------------------------------------------///
 	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_100MS_EVT);				
-	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_10MS_EVT);	`			
+	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_10MS_EVT);
 	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_20MS_EVT);																				
 }
 
