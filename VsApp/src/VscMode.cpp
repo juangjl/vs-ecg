@@ -13,13 +13,16 @@
 ///------------------------------------------///
 #include "Global.h"
 
-VscModeControlType VscMode;
+VscModeControlType VscModeCtl;
 
 void VscModeInfoParse(VscModeControlType *pVscMode)
 {
 	VscModeItemType *pItem = &pVscMode->item;
-	JSHORT  psGSData[2];
-
+	JSHORT  	psGSData[2];
+	
+	JAtrType 	*pAtrRead = NULL;
+	JAtrQueueType * pAtrQueue = &AtrQueue;
+	
 	/// VSC_MODE_INFO_TYPE0_TIME_UTC								(1)	
 	UtilMemcpy((JBYTE *)&pVscMode->dwUTC, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_TIME_UTC], 4);
 		
@@ -112,9 +115,29 @@ void VscModeInfoParse(VscModeControlType *pVscMode)
 	UtilMemcpy((JBYTE *)&psGSData[0], (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_GSEN_DATA7], 4);
 	pVscMode->sGSenZ[4] = psGSData[0];
 
-	////--------------------------------------------------------------------------///
+	/// VSC_MODE_INFO_TYPE0_ATR               			(27) ///< ATR			
+	pAtrRead = &pVscMode->atrNow;	
+	UtilMemcpy((JBYTE *)pAtrRead, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR], 4);	
+	if(pAtrRead->bAtr != ATR_NONE)
+	{	
+		///--------------------------------------------------------------------------------///	
+		/// VSC ATR Data add into queue
+		///--------------------------------------------------------------------------------///
+		if(((GlobalVar.iVscAtrQueueTail + 1) % VSC_ATR_QUEUE_CNT) == GlobalVar.iVscAtrQueueHead)
+		{
+			/// Queue is full, do shift
+			GlobalVar.iVscAtrQueueHead =  (GlobalVar.iVscAtrQueueHead + 1) % VSC_ATR_QUEUE_CNT;
+		}
+		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrQueue[GlobalVar.iVscAtrQueueTail], (JBYTE *)pAtrRead, 4);	
+		GlobalVar.iVscAtrQueueTail = (GlobalVar.iVscAtrQueueTail + 1) % VSC_ATR_QUEUE_CNT;
+
+		//JAtrAddEx(pAtrQueue, pAtrRead);				
+		GlobalVar.bVscAtrUpdated = TRUE;	
+	}
+
+	///--------------------------------------------------------------------------///
 	/// HRV
-	////--------------------------------------------------------------------------///
+	///--------------------------------------------------------------------------///
 
 	/// TP	
 	pVscMode->fHrvTP = (pVscMode->fHrvVLF + pVscMode->fHrvLF + pVscMode->fHrvHF);
@@ -231,15 +254,15 @@ void VscModeInfoSave(VscModeControlType *pVscMode)
 	FILE *fp = NULL;	
 	JBOOL bHeaderGen = FALSE;
 
-	if(UtilFileExisted(pVscMode->strFileNameInfo) == FALSE)
+	if(UtilFileExisted(GlobalVar.strVscFileNameInfo) == FALSE)
 	{
 		bHeaderGen = TRUE;
 	}
 	
-	fp  = fopen(pVscMode->strFileNameInfo, "a+");
+	fp  = fopen(GlobalVar.strVscFileNameInfo, "a+");
 	if(fp == NULL)
 	{
-		sprintf(msg, "\t\t [VSC][ERROR][INFO] Failed to open %s\r\n", VscMode.strFileNameInfo);
+		sprintf(msg, "\t\t [VSC][ERROR][INFO] Failed to open %s\r\n", GlobalVar.strVscFileNameInfo);
 		DBG_PRINTF(msg);		
 		return;
 	}
@@ -336,21 +359,21 @@ void VscModeGSensorDataSave(VscModeControlType *pVscMode)
 	FILE *fp = NULL;	
 	JBOOL bCreate = FALSE;
 
-	if(UtilFileExisted(pVscMode->strFileNameGSensor) == FALSE)
+	if(UtilFileExisted(GlobalVar.strVscFileNameGSensor) == FALSE)
 	{
 		bCreate = TRUE;
 	}
 	if(bCreate == TRUE)
 	{
-		fp = fopen(pVscMode->strFileNameGSensor, "w+");
+		fp = fopen(GlobalVar.strVscFileNameGSensor, "w+");
 	}
 	else
 	{
-		fp = fopen(pVscMode->strFileNameGSensor, "a+");
+		fp = fopen(GlobalVar.strVscFileNameGSensor, "a+");
 	}
 	if(fp == NULL)
 	{
-		sprintf(msg, "\t\t [VSC][ERROR][GSENSOR] Failed to open %s\r\n", VscMode.strFileNameGSensor);
+		sprintf(msg, "\t\t [VSC][ERROR][GSENSOR] Failed to open %s\r\n", GlobalVar.strVscFileNameGSensor);
 		DBG_PRINTF(msg);		
 		return;
 	}
@@ -373,78 +396,17 @@ void VscModeEcgDataParse(VscModeControlType *pVscMode)
 
 	FILE *fp = NULL;	
 
- 	iCnt = (VSC_MODE_ITEM_DATA_SIZE / sizeof(JFLOAT) ) / VscMode.iChannelCount;
+ 	iCnt = (VSC_MODE_ITEM_DATA_SIZE / sizeof(JFLOAT) ) / VscModeCtl.iChannelCount;
  	
 	pfData =(JFLOAT *) &pItem->bData[0];
 	for(i = 0 ; i < iCnt; i = i + 1)
 	{
-		for(iCH = 0 ; iCH < VscMode.iChannelCount; iCH = iCH + 1)
+		for(iCH = 0 ; iCH < VscModeCtl.iChannelCount; iCH = iCH + 1)
 		{
 			pVscMode->fValueCH[iCH][i] = pfData[idx];			
 			idx = idx + 1;
 		}
 	}
-}
-
-void VscModeFileNameSet(VscModeControlType *pVscMode)
-{
-	JINT i = 0;
-	char strFileName[256];
-	FILE *fp = NULL;
-
-	///----------------------------------------------------------------------///
-	/// 1. Date folder Set
-	///----------------------------------------------------------------------///
-	sprintf((char *)&pVscMode->strDateFolder[0], "%s/%04d%02d%02d", 
-										pVscMode->strBaseFolder,
-										pVscMode->jtm.iYear,
-										pVscMode->jtm.iMonth,
-										pVscMode->jtm.iDay);
-
-	if(UtilFolderExisted(pVscMode->strDateFolder) == FALSE)
-	{
-		UtilFolderCreate(pVscMode->strDateFolder);
-	}
-
-	///----------------------------------------------------------------------///
-	/// 2. Hour folder Set
-	///----------------------------------------------------------------------///
-	sprintf((char *)&pVscMode->strHourFolder[0], "%s/%02d", 
-										pVscMode->strDateFolder,
-										pVscMode->jtm.iHour);
-
-	if(UtilFolderExisted(pVscMode->strHourFolder) == FALSE)
-	{
-		UtilFolderCreate(pVscMode->strHourFolder);
-	}
-
-	///----------------------------------------------------------------------///
-	/// 3. Set ECG Data
-	///----------------------------------------------------------------------///
-	for(i = 0 ; i < pVscMode->iChannelCount; i = i + 1)
-	{	
-		sprintf((char *)&strFileName[0], "%s/ch%d.reso", pVscMode->strHourFolder, i);
-		if(UtilFileExisted(strFileName) == FALSE)
-		{
-			fp = fopen(strFileName, "w+");
-			if(fp != NULL)
-			{
-				fprintf(fp, "%0.3f", 1.0);
-				fclose(fp);
-			}
-		}
-		sprintf((char *)&pVscMode->strFileNameData[i][0], "%s/ch%d.csv", pVscMode->strHourFolder, i);		
-	}
-
-	///----------------------------------------------------------------------///
-	/// 4. Set Info data
-	///----------------------------------------------------------------------///
-	sprintf((char *)&pVscMode->strFileNameInfo[0], "%s/info.csv", pVscMode->strHourFolder);	
-
-	///----------------------------------------------------------------------///
-	/// 5. Set GSensor data
-	///----------------------------------------------------------------------///
-	sprintf((char *)&pVscMode->strFileNameGSensor[0], "%s/gsen.csv", pVscMode->strHourFolder);	
 }
 
 void VscModeEcgDataSave(VscModeControlType *pVscMode)
@@ -455,14 +417,14 @@ void VscModeEcgDataSave(VscModeControlType *pVscMode)
 	JINT iCnt = 0;
 	char 	msg[256];
 
-	iCnt = (VSC_MODE_ITEM_DATA_SIZE / sizeof(JFLOAT)) / VscMode.iChannelCount;
+	iCnt = (VSC_MODE_ITEM_DATA_SIZE / sizeof(JFLOAT)) / VscModeCtl.iChannelCount;
 
 	for(iCH = 0 ; iCH< pVscMode->iChannelCount; iCH = iCH + 1)
 	{
-		fp = fopen (pVscMode->strFileNameData[iCH], "a+");
+		fp = fopen (GlobalVar.strVscFileNameEcg[iCH], "a+");
 		if(fp == NULL)
 		{
-			sprintf(msg, "\t\t [VSC][ERROR][ECG][%02d] Failed to open '%s'\r\n", iCH, (char *) &pVscMode->strFileNameData[iCH]);
+			sprintf(msg, "\t\t [VSC][ERROR][ECG][%02d] Failed to open '%s'\r\n", iCH, (char *) &GlobalVar.strVscFileNameEcg[iCH]);
 			DBG_PRINTF(msg);		
 			continue;
 		}
@@ -475,6 +437,125 @@ void VscModeEcgDataSave(VscModeControlType *pVscMode)
 	}
 }
 
+void VscModeAtrBinSave(void)
+{
+	FILE *fp  = NULL;
+	char msg[256];
+	JINT idx = GlobalVar.iVscAtrCnt;
+	JINT A = 0;
+	JFLOAT fTimeSec = 0;
+	JAtrType *pAtr = &GlobalVar.vscAtrNow;
+
+	JAtrDataGet(pAtr, &A, &fTimeSec);
+	JAtrFileBinSave(GlobalVar.strVscFileNameAtrBin, idx, A, fTimeSec);
+}
+
+void VscModeAtrCsvSave(void)
+{
+	FILE *fp  = NULL;
+	char msg[256];
+	JINT idx = GlobalVar.iVscAtrCnt;
+	
+	JINT A = 0;
+	JFLOAT fTimeSec  = 0;
+
+	JINT APre = 0;
+	JFLOAT fTimeSecPre  = 0;
+
+	JFLOAT fDeltaSec = 0;
+
+	JAtrType *pAtrNow = &GlobalVar.vscAtrNow;
+	JAtrType *pAtrPre = &GlobalVar.vscAtrPre;
+
+	JAtrDataGet(pAtrNow, &A, &fTimeSec);
+	JAtrDataGet(pAtrPre, &APre, &fTimeSecPre);
+
+	if(pAtrPre->bAtr == ATR_NONE)
+	{
+		fDeltaSec = 0;
+	}
+	else
+	{
+		fDeltaSec = fTimeSec - fTimeSec;
+		if(fDeltaSec > 1.5)
+		{
+			fDeltaSec = 0;
+		}
+		if(fDeltaSec <= 0 )
+		{
+			fDeltaSec = 0;
+		}
+	}
+	JAtrFileCsvSave(GlobalVar.strVscFileNameAtrCsv, idx, A, fTimeSec, fDeltaSec);
+}
+
+void VscModeFileNameSet(VscModeControlType *pVscMode)
+{
+	JINT i = 0;
+	char strFileName[256];
+	FILE *fp = NULL;
+
+	///----------------------------------------------------------------------///
+	/// 1. Date folder Set
+	///----------------------------------------------------------------------///
+	sprintf((char *)&GlobalVar.strVscDateFolder[0], "%s/%04d%02d%02d", 
+										GlobalVar.strVscBaseFolder,
+										pVscMode->jtm.iYear,
+										pVscMode->jtm.iMonth,
+										pVscMode->jtm.iDay);
+
+	if(UtilFolderExisted(GlobalVar.strVscDateFolder) == FALSE)
+	{
+		UtilFolderCreate(GlobalVar.strVscDateFolder);
+	}
+
+	///----------------------------------------------------------------------///
+	/// 2. Hour folder Set
+	///----------------------------------------------------------------------///
+	sprintf((char *)&GlobalVar.strVscHourFolder[0], "%s/%02d", 
+										GlobalVar.strVscDateFolder,
+										pVscMode->jtm.iHour);
+
+	if(UtilFolderExisted(GlobalVar.strVscHourFolder) == FALSE)
+	{
+		UtilFolderCreate(GlobalVar.strVscHourFolder);
+	}
+
+	///----------------------------------------------------------------------///
+	/// 3. Set ECG Data
+	///----------------------------------------------------------------------///
+	for(i = 0 ; i < pVscMode->iChannelCount; i = i + 1)
+	{	
+		sprintf((char *)&strFileName[0], "%s/ch%d.reso", GlobalVar.strVscHourFolder, i);
+		if(UtilFileExisted(strFileName) == FALSE)
+		{
+			fp = fopen(strFileName, "w+");
+			if(fp != NULL)
+			{
+				fprintf(fp, "%0.3f", 1.0);
+				fclose(fp);
+			}
+		}
+		sprintf((char *)&GlobalVar.strVscFileNameEcg[i][0], "%s/ch%d.csv", GlobalVar.strVscHourFolder, i);		
+	}
+
+	///----------------------------------------------------------------------///
+	/// 4. Set Info data
+	///----------------------------------------------------------------------///
+	sprintf((char *)&GlobalVar.strVscFileNameInfo[0], 			"%s/info.csv", GlobalVar.strVscHourFolder);	
+
+	///----------------------------------------------------------------------///
+	/// 5. Set GSensor data
+	///----------------------------------------------------------------------///
+	sprintf((char *)&GlobalVar.strVscFileNameGSensor[0], 		"%s/gsen.csv", GlobalVar.strVscHourFolder);	
+
+	///----------------------------------------------------------------------///
+	/// 6. Set ATR data
+	///----------------------------------------------------------------------///
+	sprintf((char *)&GlobalVar.strVscFileNameAtrBin[0], 		"%s/vsc.atr.bin", GlobalVar.strVscHourFolder);	
+	sprintf((char *)&GlobalVar.strVscFileNameAtrCsv[0], 		"%s/vsc.atr.csv", GlobalVar.strVscHourFolder);	
+}
+
 void VscModeSave(VscModeControlType *pVscMode)
 {
 	char msg[256];
@@ -483,20 +564,26 @@ void VscModeSave(VscModeControlType *pVscMode)
 	/// File Set
 	VscModeFileNameSet(pVscMode);
 
-	if(strlen(pVscMode->strFileNameInfo) == 0)
+	if(strlen(GlobalVar.strVscFileNameInfo) == 0)
 	{
-		sprintf(msg, "[ERROR][!!!!][%d] VscMode->strFileNameInfo = '%s'\r\n",pVscMode->wId,  pVscMode->strFileNameInfo);
+		sprintf(msg, "[ERROR][!!!!][%d] GlobalVar.strVscFileNameInfo = '%s'\r\n",pVscMode->wId,  GlobalVar.strVscFileNameInfo);
 		DBG_PRINTF(msg);
 		return;
 	}
 
-	/// ECG Data Save
+	///------------------------------------------------///
+	/// 1. ECG Data Save
+	///------------------------------------------------///
 	VscModeEcgDataSave(pVscMode);
 
-	/// GSensor Data Save
+	///------------------------------------------------///
+	/// 2. GSensor Data Save
+	///------------------------------------------------///
 	VscModeGSensorDataSave(pVscMode);
-
-	/// GSensor information
+	
+	///------------------------------------------------///
+	/// 3. GSensor information
+	///------------------------------------------------///
 	if((pItem->wId % 5) == 0)
 	{
 		VscModeInfoSave(pVscMode);
@@ -512,7 +599,7 @@ void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData)
 	JINT 		j = 0;
 	JINT		idx = 0;
 	
-	VscModeControlType *pVscMode = &VscMode;
+	VscModeControlType *pVscMode = &VscModeCtl;
 	VscModeItemType *pItem = &pVscMode->item;	
 
 	pItem->wId = wId;
@@ -539,11 +626,16 @@ void VscModeInit(char *pBaseFolder)
 	JTM jtm;
 	time_t t = time(NULL);
 	JTMLocalTimeGet(&jtm, t);	
-	VscModeControlType *pVscMode = &VscMode;
+	VscModeControlType *pVscMode = &VscModeCtl;
 
 	pVscMode->wId = 0;
 	pVscMode->iChannelCount = VSC_MODE_CAHNNEL_COUNT; ///< 2 channel
 	/// set the base folder size 
-	strcpy(pVscMode->strBaseFolder, pBaseFolder);
+	strcpy(GlobalVar.strVscBaseFolder, pBaseFolder);
+
+	///--------------------------------------------------------///
+	/// VSC ATR Init
+	///--------------------------------------------------------///
+	FuncVscAtrInit();
 }
 

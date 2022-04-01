@@ -33,7 +33,10 @@ void BleState(void)
 	{
 		if((GlobalVar.dwSysCtl2 & SYS_CTL2_SEC_EVT) != 0)
 		{
-			FuncBleOpenCheck();
+			if(FuncBleOpenCheck() == FALSE)
+			{
+				
+			}
 			if(GlobalVar.bBleConnected == TRUE)
 			{
 				GlobalVar.iBleState = BLE_STATE_CONNECTED;

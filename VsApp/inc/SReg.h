@@ -21,6 +21,7 @@
 #define SREG_MEAS_LEAD_OFF          "SREG_MEAS_LEAD_OFF"
 #define SREG_MEAS_LEAD_OFF_COMP_TH  "SREG_MEAS_LEAD_OFF_COMP_TH"
 #define SREG_MEAS_LEAD_OFF_CURR     "SREG_MEAS_LEAD_OFF_CURR"
+#define SREG_MEAS_MOTION_MODE       "SREG_MEAS_MOTION_MODE"
 
 ///---------------------------------------------------------------------------------------------------------------///
 ///
@@ -58,12 +59,13 @@ typedef struct SRegActSt
 ///----------------------------------------------------------------------------------///
 /// SREG APP : for APP REG data saving
 ///----------------------------------------------------------------------------------///
-#define SREG_DATA_DEVICE_NAME_SIZE        (32)
-#define SREG_DATA_DEVICE_SSN_SIZE         (32)
-#define SREG_DATA_MEAS_ZERO_BASE_SIZE     (1)
-#define SREG_DATA_MEAS_LEAD_OFF_SIZE      (1)
-#define SREG_DATA_MEAS_LEAD_COMP_TH_SIZE  (4)
-#define SREG_DATA_MEAS_LEAD_OFF_CURR_SIZE (1)
+#define SREG_DATA_DEVICE_NAME_SIZE          (32)
+#define SREG_DATA_DEVICE_SSN_SIZE           (32)
+#define SREG_DATA_MEAS_ZERO_BASE_SIZE       (1)
+#define SREG_DATA_MEAS_LEAD_OFF_SIZE        (1)
+#define SREG_DATA_MEAS_LEAD_COMP_TH_SIZE    (4)
+#define SREG_DATA_MEAS_LEAD_OFF_CURR_SIZE   (1)
+#define SREG_DATA_MEAS_MOTION_ACTIVATE_SIZE (1)
 
 typedef struct SRegAppSt
 {
@@ -73,6 +75,7 @@ typedef struct SRegAppSt
   JBYTE MEAS_LEAD_OFF[SREG_DATA_MEAS_LEAD_OFF_SIZE];  
   JBYTE MEAS_LEAD_OFF_COMP_TH[SREG_DATA_MEAS_LEAD_COMP_TH_SIZE];  
   JBYTE MEAS_LEAD_OFF_CURR[SREG_DATA_MEAS_LEAD_OFF_CURR_SIZE];
+  JBYTE MEAS_MOTION_MODE[SREG_DATA_MEAS_MOTION_ACTIVATE_SIZE];
 } SRegAppType;
 
 #pragma pack(pop)

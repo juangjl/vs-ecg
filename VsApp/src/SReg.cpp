@@ -108,6 +108,29 @@ JBOOL SRegActMeasZeroBase(SRegType *pSReg, JBYTE bAction)
   return TRUE;
 }
 
+JBOOL SRegActMeasMotionMode(SRegType *pSReg, JBYTE bAction)
+{
+  char msg[256];
+  if(bAction == SREG_ACT_WRITE)
+  {    
+    ///----------------------------------------------------------------------------------------------///
+    /// SREG_WRITE 
+    ///----------------------------------------------------------------------------------------------///
+    sprintf(msg, "[SREG][WRITE] %s\r\n", pSReg->strName);
+    DBG_PRINTF(msg);
+  }
+  else if(bAction == SREG_ACT_READ)
+  {  
+    UtilMemcpy((JBYTE *)&SRegApp.MEAS_MOTION_MODE[0],  (JBYTE *) &pSReg->bData[0], SREG_DATA_MEAS_MOTION_ACTIVATE_SIZE);       
+    ///----------------------------------------------------------------------------------------------///
+    /// SREG_READ
+    ///----------------------------------------------------------------------------------------------///
+    sprintf(msg, "\t [SREG][READ] %s :%d\r\n", pSReg->strName, SRegApp.MEAS_MOTION_MODE[0]);
+    DBG_PRINTF(msg);
+  }      
+  return TRUE;
+}
+
 JBOOL SRegActMeasLeadOff(SRegType *pSReg, JBYTE bAction)
 {
   char msg[256];
@@ -209,9 +232,14 @@ void SRegActProcess(SRegType *pSReg, JBYTE bAction)
 }
 
 void SRegRead(SRegType *pSReg)
-{  
-  if(CmdSBleSRegRead(pSReg) != NO_ERR)
+{
+  char msg[256];
+  JINT iErrNo = NO_ERR; 
+  iErrNo = CmdSBleSRegRead(pSReg);
+  if(iErrNo != NO_ERR)
   {    
+    GlobalVar.dwSysCtl6 |= SYS_CTL6_BLE_MASTER_CLOSE;
+    sprintf(msg, "[SREG][READ] ERROR %d\r\n", iErrNo);
     GlobalVar.dwSysCtl6 |= SYS_CTL6_BLE_MASTER_CLOSE;
   }
   SRegActProcess(pSReg, SREG_ACT_READ);
@@ -219,17 +247,23 @@ void SRegRead(SRegType *pSReg)
 
 void SRegWrite(SRegType *pSReg)
 {
-  if(CmdSBleSRegWrite(pSReg) != NO_ERR)
+  char msg[256];
+  JINT iErrNo = NO_ERR;
+  iErrNo = CmdSBleSRegWrite(pSReg);
+  if(iErrNo != NO_ERR)
   {
     GlobalVar.dwSysCtl6 |= SYS_CTL6_BLE_MASTER_CLOSE;
+    sprintf(msg, "[SREG][WRITE] ERROR %d\r\n", iErrNo);
+    DBG_PRINTF(msg);
   }
 }
 
 void SRegInit(void)
 {
-  SRegApp.MEAS_ZERO_BASE[0]     = 0xFF;
-  SRegApp.MEAS_LEAD_OFF[0]      = 0xFF;
-  SRegApp.MEAS_LEAD_OFF_CURR[0] = 0xFF; 
+  SRegApp.MEAS_ZERO_BASE[0]       = 0xFF;
+  SRegApp.MEAS_LEAD_OFF[0]        = 0xFF;
+  SRegApp.MEAS_LEAD_OFF_CURR[0]   = 0xFF; 
+  SRegApp.MEAS_MOTION_MODE[0]     = 0xFF;
 }
 
 ///---------------------------------------------------------------------------------------------------------------///
@@ -246,6 +280,7 @@ SRegActType SRegActArr[] =
   SREG_MEAS_LEAD_OFF_COMP_TH,  SRegActMeasLeadOffCompThreshold,  
   SREG_MEAS_LEAD_OFF_CURR,     SRegActMeasLeadOffCurrLevel,  
   SREG_MEAS_LEAD_OFF,          SRegActMeasLeadOff,  
+  SREG_MEAS_MOTION_MODE,       SRegActMeasMotionMode,  
   "",                          SRegActDefault
 };
 

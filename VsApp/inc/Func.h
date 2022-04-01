@@ -35,14 +35,17 @@ extern JBOOL FuncVscModeStart(void);
 extern JBOOL FuncVscModeStop(void);
 extern JBOOL FuncVscModeRead(JINT iSecTotal);
 
-extern JBOOL FuncEcgFileDataGet(JINT iTimeMS, JDataSet *pDataSet);
-
-extern JBOOL  FuncSRegRead(char *strRegName);
-extern JBOOL  FuncSRegWrite(char *strRegName, JBYTE *pbData);
+extern JBOOL FuncSRegRead(char *strRegName);
+extern JBOOL FuncSRegWrite(char *strRegName, JBYTE *pbData);
 
 extern JBOOL FuncSerialPortDetect(void);
 
+extern JBOOL FuncEcgFileDataGet(JINT iTimeMS, JDataSet *pDataSet);
 extern JBOOL FuncEcgFileDataLoad(char *pFilePath);
 extern JBOOL FuncVscInfoDataLoad(char *pFilePath);
+
+extern JBOOL FuncAtrDataLoad(AtrCtlType *pAtrCtl, char *pFilePath);
+
+extern JBOOL FuncVscAtrInit(void);
 
 #endif ///< for __FUNC_H__

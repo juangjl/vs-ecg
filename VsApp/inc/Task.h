@@ -21,7 +21,7 @@ extern void   TaskBleControl(void);
 
 extern void   TaskBleState(void);
 
-extern void   TaskBleVscMode(void);
+extern void   SubBleVscMode(void);
 
 extern void 	TaskRoundEnd(void);
 

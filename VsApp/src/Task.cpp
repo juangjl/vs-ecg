@@ -5,7 +5,7 @@
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
- * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd.,, all rights reserved.
+ * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  * @note
  */
 ///------------------------------------------///
@@ -15,8 +15,7 @@
 
 void TaskRoundInit(void)
 {
-	TimerTick();
-	TimerEventSet();	
+	TimerEventSet();
 }
 
 void TaskSerialPort(void)
@@ -31,7 +30,7 @@ void TaskSerialPort(void)
 		ConfigStrGet((char *)CONFIG_ITEM_SERIAL_PORT, &strComName[0]);
 		SERIAL_PORT_NAME_SET(strComName);
 		if(SERIAL_PORT_OPEN() == TRUE)
-		{
+		{			
 			GlobalVar.dwSysSta5 |= SYS_STA5_SERIAL_PORT_OPEN;
 			FuncVSDongleVersionGet();
 			FuncVSDongleTimeSet();
@@ -39,6 +38,9 @@ void TaskSerialPort(void)
 		else
 		{
 			GlobalVar.dwSysSta5 &= ~SYS_STA5_SERIAL_PORT_OPEN;
+
+			/// set serial port open failed
+			GlobalVar.dwSysCtl7 |= SYS_CTL7_MSG_SERIAL_PORT_OPEN_FAILED;
 		}
 
 		GlobalVar.dwSysCtl5 &= ~SYS_CTL5_SERIAL_PORT_OPEN;
@@ -53,7 +55,7 @@ void TaskSerialPort(void)
 		SERIAL_PORT_CLOSE();
 
 		GlobalVar.dwSysCtl5 &= ~SYS_CTL5_SERIAL_PORT_CLOSE;
-	}
+	}	
 }
 
 void TaskBleSReg(void)
@@ -76,10 +78,9 @@ void TaskBleSReg(void)
 
 	if(GlobalVar.bSRegWrite == TRUE)
 	{
-		sprintf(msg, "SREG_WRITE -> %s\r\n", pSReg->strName);
-		
-		DBG_PRINTF(msg);
 		SRegWrite(pSReg);
+		sprintf(msg, "SREG_WRITE -> %s\r\n", pSReg->strName);		
+		DBG_PRINTF(msg);
 	}
 	else
 	{		
@@ -91,9 +92,8 @@ void TaskBleSReg(void)
 	GlobalVar.bSRegOn = FALSE;
 }
 
-
 void TaskBleControl(void)
-{
+{	
 	///----------------------------------------------------------------------///
 	/// Control Event Check
 	///----------------------------------------------------------------------///
@@ -113,12 +113,77 @@ void TaskBleState(void)
 	BleState();
 }
 
-void TaskBleVscMode(void)
+void TaskRoundEnd(void)
+{
+	TimerEventClear();
+	while(1)
+	{
+		if(GlobalVar.dwSysCtl2 & SYS_CTL2_TASK_ISR)
+		{
+			break;
+		}
+		UtilUsSleep(50);
+	}
+	GlobalVar.dwSysCtl2 &=~ SYS_CTL2_TASK_ISR;
+}
+
+///------------------------------------------///
+/// MainLoop Start
+///------------------------------------------///
+void MainLoopStart(void)
+{
+	JINT iErr = 0;
+
+	///--------------------------------------------------------------------------------///
+	/// Seperate APP and Function 
+	///--------------------------------------------------------------------------------///
+	iErr = pthread_create(&GlobalVar.tid1, NULL, &ThreadMainLoop, NULL);	
+	if(iErr != 0)
+	{
+		printf("can't create thread :[%s]\r\n", strerror(iErr));
+	}
+	else
+	{		
+		pthread_detach(GlobalVar.tid1);		
+	}
+}
+
+///------------------------------------------///
+/// MainLoop
+///------------------------------------------///
+void MainLoop()
+{
+	while(1)
+	{
+		TaskRoundInit();
+		
+		TaskSerialPort();
+
+		TaskBleSReg();
+		
+		TaskBleControl();
+		
+		TaskBleState();
+		
+		TaskRoundEnd();		
+
+		if(GlobalVar.bAppExit == TRUE)
+		{
+			break;
+		}		
+	}
+	return;
+}
+
+///----------------------------------------------------------------------------------------///
+/// Sub-Task
+///----------------------------------------------------------------------------------------///
+void SubBleVscMode(void)
 {
 	char msg[256];
 	
-	JDataSet *pDS0 	 = &GlobalVar.dataSet[DATASET_MONITOR_ECG_DS1];
-	JDataSet *pDS1 	 = &GlobalVar.dataSet[DATASET_MONITOR_ECG_DS0];
+	JDataSet *pDS0 	 = &GlobalVar.dataSet[DATASET_MONITOR_ECG_DS0];
+	JDataSet *pDS1 	 = &GlobalVar.dataSet[DATASET_MONITOR_ECG_DS1];
 
 	JDataSet *pDS2 	 = &GlobalVar.dataSet[DATASET_MONITOR_GSENSOR_X];
 	JDataSet *pDS3 	 = &GlobalVar.dataSet[DATASET_MONITOR_GSENSOR_Y];
@@ -133,10 +198,10 @@ void TaskBleVscMode(void)
 
 	VscModeControlType *pVscMode = NULL;
 
-	JINT i = 0;
-	JFLOAT fGSenX[VSC_MODE_GSENSOR_DATA_COUNT];
-	JFLOAT fGSenY[VSC_MODE_GSENSOR_DATA_COUNT];
-	JFLOAT fGSenZ[VSC_MODE_GSENSOR_DATA_COUNT];
+	JINT 		i = 0;
+	JFLOAT 	fGSenX[VSC_MODE_GSENSOR_DATA_COUNT];
+	JFLOAT 	fGSenY[VSC_MODE_GSENSOR_DATA_COUNT];
+	JFLOAT 	fGSenZ[VSC_MODE_GSENSOR_DATA_COUNT];
 
 	if(GlobalVar.bVscModeAdded == FALSE)
 	{
@@ -144,14 +209,14 @@ void TaskBleVscMode(void)
 	}
 
 	GlobalVar.bVscModeAdded = FALSE;
-	while (1)
+	while(1)
 	{
 		if(GlobalVar.iVscModeArrIdxRead == GlobalVar.iVscModeArrIdx)
 		{
 			break;
 		}
 		pVscMode = &GlobalVar.vscModeArr[GlobalVar.iVscModeArrIdxRead];
-
+		
 		///------------------------------------------------------------------------------------------///
 		///  Save VscMode Data
 		///------------------------------------------------------------------------------------------///
@@ -187,39 +252,58 @@ void TaskBleVscMode(void)
 	}
 }
 
-void TaskRoundEnd(void)
-{
-	if(GlobalVar.dwSysCtl2 & SYS_CTL2_TIMER_10MS_EVT)
+void SubBleVscAtr(void)
+{	
+	char msg[256];
+	AtrCtlType * pAtrCtl = &AtrCtlBle;	
+	JAtrType *pAtrRead = NULL;
+	JINT A = 0;
+	JFLOAT fTimeSec = 0;
+	JAtrType *pAtr = NULL;
+
+	char strFileName[256];
+
+	if(GlobalVar.bVscAtrUpdated == FALSE)
 	{
-		UtilMsSleep(7);
+		return;
 	}
-	else
+
+	while(1)
 	{
-		UtilUsSleep(50);
-	}
-	TimerEventClear();
+		if(GlobalVar.iVscAtrQueueHead == GlobalVar.iVscAtrQueueTail)
+		{
+			break;
+		}
+		pAtrRead = &GlobalVar.vscAtrQueue[GlobalVar.iVscAtrQueueHead];
+
+		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrPre, (JBYTE *)&GlobalVar.vscAtrNow, 4);	
+		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrNow, (JBYTE *)pAtrRead, 4);		
+    
+		JAtrDataPrint(&GlobalVar.vscAtrNow);		
+
+		GlobalVar.iVscAtrCntPre = GlobalVar.iVscAtrCnt;
+		GlobalVar.iVscAtrCnt    = GlobalVar.iVscAtrCnt + 1;
+    
+		JAtrDataGet(&GlobalVar.vscAtrNow, &A, &fTimeSec);
+
+    AtrCtlVscModeAdd(pAtrCtl, A, fTimeSec);
+		
+    /// check the atr data save  
+		if(GlobalVar.bVscModeSave == TRUE)
+		{
+			VscModeAtrBinSave();	
+			VscModeAtrCsvSave();	
+		}
+
+		GlobalVar.iVscAtrQueueHead  = (GlobalVar.iVscAtrQueueHead  + 1) % VSC_ATR_QUEUE_CNT;
+	}				
+  
+ // sprintf(msg, "\t [ATR][AtrCtlBle]%d\r\n", pAtrCtl->iAtrDataCnt);
+ /// DBG_PRINTF(msg);
+
+	GlobalVar.bVscAtrUpdated  = FALSE;	
 }
 
-///------------------------------------------///
-/// MainLoop Start
-///------------------------------------------///
-void MainLoopStart(void)
-{
-	JINT iErr = 0;
-
-	///--------------------------------------------------------------------------------///
-	/// Seperate APP and Function 
-	///--------------------------------------------------------------------------------///
-	iErr = pthread_create(&GlobalVar.tid1, NULL, &ThreadMainLoop, NULL);	
-	if(iErr != 0)
-	{
-		printf("can't create thread :[%s]\r\n", strerror(iErr));
-	}
-	else
-	{		
-		pthread_detach(GlobalVar.tid1);		
-	}
-}
 ///------------------------------------------///
 /// SubLoop Start
 ///------------------------------------------///
@@ -242,46 +326,15 @@ void SubLoopStart(void)
 }
 
 ///------------------------------------------///
-/// MainLoop
-///------------------------------------------///
-void MainLoop(void)
-{
-	while(1)
-	{
-		TaskRoundInit();
-				
-		TaskSerialPort();
-
-		TaskBleSReg();
-
-		TaskBleControl();
-
-		TaskBleState();
-
-		TaskBleVscMode();
-
-		TaskRoundEnd();		
-		
-		if(GlobalVar.bAppExit == TRUE)
-		{
-			break;
-		}
-	}
-
-	ConfigSave();
-
-	printf("\r\nbyebye\r\n");
-	return;
-}
-
-///------------------------------------------///
-/// SubLoop
+/// SubLoop  (Slow Task Loop)
 ///------------------------------------------///
 void SubLoop(void)
 {
 	while(1)
 	{		
-		TaskBleVscMode();		
+		SubBleVscMode();
+
+		SubBleVscAtr();
 
 		UtilMsSleep(5);
 

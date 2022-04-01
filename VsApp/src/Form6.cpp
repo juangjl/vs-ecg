@@ -319,6 +319,60 @@ static void CallbackForm6BtnMeasLeadoffCompThresholdSetClicked(GtkWidget *widget
 	DBG_PRINTF(msg);	
 }
 
+
+static void CallbackForm6BtnMeasMotionModeGetClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
+{	
+  ViewDataForm6Type * pViewDataPtr = (ViewDataForm6Type *)pThis->pViewData;	
+	
+	if(FuncSRegRead((char *)SREG_MEAS_MOTION_MODE) == FALSE)
+	{
+		MESSAGE_BOX("Device is busy");
+		return;
+	}
+	DBG_PRINTF("[FORM6] Motion Mode  Get\r\n");	
+}
+
+static void CallbackForm6BtnMeasMotionModeEnableClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	ViewDataForm6Type * pViewDataPtr = (ViewDataForm6Type *)pThis->pViewData;	
+	JBYTE bData[256];
+	char *pStrDeviceName = NULL;	
+	char msg[256];
+	
+
+	UtilMemset((JBYTE *)&bData[0], 0x00, SREG_DATA_SIZE);
+
+	bData[0] = TRUE;
+
+	if(FuncSRegWrite((char *)SREG_MEAS_MOTION_MODE, &bData[0]) == FALSE)
+	{
+		MESSAGE_BOX("Device is busy");
+		return;
+	}
+	sprintf(msg, "[FORM6] Motion Mode Set = %s\r\n", pStrDeviceName);
+	DBG_PRINTF(msg);	
+}
+
+static void CallbackForm6BtnMeasMotionModeDisableClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	ViewDataForm6Type * pViewDataPtr = (ViewDataForm6Type *)pThis->pViewData;	
+	JBYTE bData[256];
+	char *pStrDeviceName = NULL;	
+	char msg[256];
+	
+	UtilMemset((JBYTE *)&bData[0], 0x00, SREG_DATA_SIZE);
+
+	bData[0] = FALSE;
+	
+	if(FuncSRegWrite((char *)SREG_MEAS_MOTION_MODE, &bData[0]) == FALSE)
+	{
+		MESSAGE_BOX("Device is busy");
+		return;
+	}
+	sprintf(msg, "[FORM6]Motion Mode Set = %s\r\n", pStrDeviceName);
+	DBG_PRINTF(msg);	
+}
+
 gint CallbackForm6Timer1 (gpointer data)
 {    		
 	char strDeviceName[256];
@@ -345,7 +399,7 @@ gint CallbackForm6Timer1 (gpointer data)
 		bEnable = FALSE;
 	}
 
-		if(bEnable == FALSE)
+	if(bEnable == FALSE)
 	{
 		JViewButtonDisable(pViewDataPtr->pBtnDeviceNameGet);
 		JViewButtonDisable(pViewDataPtr->pBtnDeviceNameSet);
@@ -359,11 +413,17 @@ gint CallbackForm6Timer1 (gpointer data)
 		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffGet);
 		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffEnable);
 		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffDisable);
+    
 		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffCompThresholdSet);
 		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffCompThresholdGet);
-		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffCurrSet);
-		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffCurrGet);
 
+    JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffCurrSet);
+		JViewButtonDisable(pViewDataPtr->pBtnMeasLeadOffCurrGet);
+    
+		JViewButtonDisable(pViewDataPtr->pBtnMeasMotionModeGet);
+		JViewButtonDisable(pViewDataPtr->pBtnMeasMotionModeEnable);
+		JViewButtonDisable(pViewDataPtr->pBtnMeasMotionModeDisable);
+    
 		gtk_widget_set_sensitive(pViewDataPtr->pEntryDeviceName, FALSE);
 		gtk_widget_set_sensitive(pViewDataPtr->pEntryDeviceSsn, FALSE);
 		gtk_widget_set_sensitive(pViewDataPtr->pEntryLeadOffCompThreshold, FALSE);
@@ -383,10 +443,16 @@ gint CallbackForm6Timer1 (gpointer data)
 		JViewButtonEnable(pViewDataPtr->pBtnMeasLeadOffGet);
 		JViewButtonEnable(pViewDataPtr->pBtnMeasLeadOffEnable);
 		JViewButtonEnable(pViewDataPtr->pBtnMeasLeadOffDisable);
+    
 		JViewButtonEnable(pViewDataPtr->pBtnMeasLeadOffCompThresholdSet);
 		JViewButtonEnable(pViewDataPtr->pBtnMeasLeadOffCompThresholdGet);
+
 		JViewButtonEnable(pViewDataPtr->pBtnMeasLeadOffCurrSet);
 		JViewButtonEnable(pViewDataPtr->pBtnMeasLeadOffCurrGet);
+
+		JViewButtonEnable(pViewDataPtr->pBtnMeasMotionModeGet);
+		JViewButtonEnable(pViewDataPtr->pBtnMeasMotionModeEnable);
+		JViewButtonEnable(pViewDataPtr->pBtnMeasMotionModeDisable);
 
 		gtk_widget_set_sensitive(pViewDataPtr->pEntryDeviceName, TRUE);
 		gtk_widget_set_sensitive(pViewDataPtr->pEntryDeviceSsn, TRUE);
@@ -469,8 +535,14 @@ gint CallbackForm6Timer1 (gpointer data)
 	/// MEAS_LEAD_OFF CompThreshold
 	///---------------------------------------------------------------------------------------------///	
 	UtilMemcpy((JBYTE*)&fData, &SRegApp.MEAS_LEAD_OFF_COMP_TH[0], SREG_DATA_MEAS_LEAD_COMP_TH_SIZE);
-	sprintf(strLabel, "%.1f", fData);
-
+	if(fData < 70)
+  {
+  	sprintf(strLabel, "%s", "--");
+	} 
+  else
+  {
+    sprintf(strLabel, "%.1f", fData);
+  }
 	if(strlen(strLabel) > 0)
 	{
 		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelLeadOffCompThreshold), (char *) &strLabel[0]);		
@@ -491,6 +563,26 @@ gint CallbackForm6Timer1 (gpointer data)
 	if(strlen(strLabel) > 0)
 	{
 		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelLeadOffCurrent), (char *) &strLabel[0]);		
+	}
+
+	///---------------------------------------------------------------------------------------------///
+	/// MEAS_MOTION_MODE
+	///---------------------------------------------------------------------------------------------///	
+	if(SRegApp.MEAS_MOTION_MODE[0] == 1)
+	{
+		sprintf(strLabel, "%s", "ON");
+	}
+	else if(SRegApp.MEAS_MOTION_MODE[0] == 0)
+	{
+		sprintf(strLabel, "%s", "OFF");
+	}
+	else
+	{
+		sprintf(strLabel, "%s", "--");
+	}
+	if(strlen(strLabel) > 0)
+	{
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelMeasMotionMode), (char *) &strLabel[0]);		
 	}
 
 
@@ -617,6 +709,23 @@ static JINT LabelInit(void)
 	gtk_widget_set_size_request(pLabel, w, h);  
   gtk_widget_show(pLabel);
 	pViewDataPtr->pLabelLeadOffCurrent = pLabel;		
+  
+	///-----------------------------------------------------------------------///
+	/// Label LeadOff
+	///-----------------------------------------------------------------------///
+	x0 = FORM6_FRAME7_LEFT + FORM6_FRAME7_XGAP;
+	y0 = FORM6_FRAME7_TOP  + FORM6_FRAME7_YGAP ;
+	w  = 300;
+	h  = 30;	
+		
+	pLabel = gtk_label_new_with_mnemonic("--");
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, "label_type2");  	
+  gtk_widget_set_name(pLabel, "");  	
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
+	gtk_widget_set_size_request(pLabel, w, h);  
+  gtk_widget_show(pLabel);
+	pViewDataPtr->pLabelMeasMotionMode = pLabel;		
   
 
 	return TRUE;
@@ -945,6 +1054,52 @@ static JINT ButtonInit(void)
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pButton, x0, y0);
   gtk_widget_show(pButton);  
  	pViewDataPtr->pBtnMeasLeadOffCurrSet = pButton;
+
+ 	///-----------------------------------------------------------------------///
+	/// Button -> BleMeasMotionModeGet
+	///-----------------------------------------------------------------------///
+	x0 = FORM6_FRAME7_LEFT + FORM6_FRAME7_XGAP + 320;
+	y0 = FORM6_FRAME7_TOP  + FORM6_FRAME7_YGAP;
+	w = 120;
+	h = 30;
+	pButton = gtk_button_new_with_label("Get");
+  gtk_widget_set_size_request(pButton, w, h); 
+  g_signal_connect(G_OBJECT(pButton), "clicked",   G_CALLBACK(CallbackForm6BtnMeasMotionModeGetClicked), NULL);
+  gtk_widget_set_name(pButton, "");  
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pButton, x0, y0);
+  gtk_widget_show(pButton);  
+ 	pViewDataPtr->pBtnMeasMotionModeGet = pButton;	 
+
+	///-----------------------------------------------------------------------///
+	/// Button -> BleMeasMotionModeEnable
+	///-----------------------------------------------------------------------///
+	x0 = FORM6_FRAME7_LEFT + FORM6_FRAME7_XGAP;
+	y0 = FORM6_FRAME7_TOP  + FORM6_FRAME7_YGAP + FORM6_FRAME0_ROW;
+	w = 120;
+	h = 30;
+	pButton = gtk_button_new_with_label("On");
+  gtk_widget_set_size_request(pButton, w, h); 
+  g_signal_connect(G_OBJECT(pButton), "clicked",   G_CALLBACK(CallbackForm6BtnMeasMotionModeEnableClicked), NULL);
+  gtk_widget_set_name(pButton, "");  
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pButton, x0, y0);
+  gtk_widget_show(pButton);  
+ 	pViewDataPtr->pBtnMeasMotionModeEnable = pButton;	 
+
+	///-----------------------------------------------------------------------///
+	/// Button -> BleMeasMotionModeDisable
+	///-----------------------------------------------------------------------///
+	x0 = FORM6_FRAME7_LEFT + FORM6_FRAME7_XGAP + 180;
+	y0 = FORM6_FRAME7_TOP  + FORM6_FRAME7_YGAP + FORM6_FRAME7_ROW;
+	w = 120;
+	h = 30;
+	pButton = gtk_button_new_with_label("Off");
+  gtk_widget_set_size_request(pButton, w, h); 
+  g_signal_connect(G_OBJECT(pButton), "clicked",   G_CALLBACK(CallbackForm6BtnMeasMotionModeDisableClicked), NULL);
+  gtk_widget_set_name(pButton, "");  
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pButton, x0, y0);
+  gtk_widget_show(pButton);  
+ 	pViewDataPtr->pBtnMeasMotionModeDisable = pButton;
+
   
 	return iRet;
 }
@@ -1075,6 +1230,22 @@ static JINT FrameInit(void)
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pFrame, x0, y0);
   gtk_widget_show(pFrame);		
     
+  
+  ///-----------------------------------------------------------------------///
+  /// FRAME#7
+  ///-----------------------------------------------------------------------///
+  x0 = FORM6_FRAME7_LEFT;
+  y0 = FORM6_FRAME7_TOP;
+  w  = FORM6_FRAME7_WIDTH;
+  h  = FORM6_FRAME7_HEIGHT;
+  sprintf(strFrameName, "%s", "Motion Artifacts Removal Function");
+  
+  pFrame = gtk_frame_new (strFrameName);
+  gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
+  gtk_frame_set_label_align (GTK_FRAME (pFrame), fXAlign, 0.5);
+  gtk_widget_set_size_request(pFrame, w, h); 
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pFrame, x0, y0);
+  gtk_widget_show(pFrame);    
 
 	return iRet;  
 }

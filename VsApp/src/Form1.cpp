@@ -205,17 +205,17 @@ static void CallbackForm1BtnBrowseClicked(GtkWidget *widget, GdkEvent *event, gp
     GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
     pFileName = gtk_file_chooser_get_filename (chooser);
 	  gtk_entry_set_text(GTK_ENTRY(pViewDataPtr->pEntryFileName), pFileName);    
-	
+
 		
 		GlobalVar.bChartEcgRun = FALSE;
-
+	
 		///-----------------------------------------------------------------------------///
 		/// Draw Chart
 		///-----------------------------------------------------------------------------///	
 		FuncEcgFileDataLoad(pFileName);
 		iTimeMS = 0;
 
-		///-----------------------------------------------------------------------------///
+	  ///-----------------------------------------------------------------------------///
 		/// File Folder Name get
 		///-----------------------------------------------------------------------------///
 		UtilFileFolderGet(pFileName, strFolderName);
@@ -223,11 +223,14 @@ static void CallbackForm1BtnBrowseClicked(GtkWidget *widget, GdkEvent *event, gp
 		FuncVscInfoDataLoad(strInfoFileName);
 
 		///-----------------------------------------------------------------------------///
-		/// update the time string
-		///-----------------------------------------------------------------------------///			
+		/// update the now time string
+		///-----------------------------------------------------------------------------///	
 		UtilTimeStrGet(iTimeMS, strTime);
 		gtk_entry_set_text(GTK_ENTRY(pViewDataPtr->pEntryChartEcgTime), strTime);  
 	  
+		///-----------------------------------------------------------------------------///
+		/// update the total time string
+		///-----------------------------------------------------------------------------///	
 		UtilTimeStrGet(GlobalVar.iFileTimeMSTotal, strTime);
 		gtk_entry_set_text(GTK_ENTRY(	pViewDataPtr->pEntryChartEcgTimeTotal), strTime);  	
     g_free (pFileName);   
@@ -247,14 +250,14 @@ static void CallbackForm1BtnChartEcgStopClicked(GtkWidget *widget, GdkEvent *eve
 {
 	GlobalVar.bChartEcgRun 		 = FALSE;	
 	GlobalVar.bChartEcgReverse = FALSE;	
-	DBG_PRINTF("[Form1][BTN] CHART STOP\r\n");
+	DBG_PRINTF("[FORM1][BTN] CHART STOP\r\n");
 }
 
 static void CallbackForm1BtnChartEcgPlayClicked(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
 	GlobalVar.bChartEcgRun 		 = TRUE;	
 	GlobalVar.bChartEcgReverse = FALSE;	
-	DBG_PRINTF("[Form1][BTN] CHART RUN\r\n");
+	DBG_PRINTF("[FORM1][BTN] CHART RUN\r\n");
 }
 
 static void CallbackForm1EntryFileNameActive(GtkWidget *widget, GdkEvent *event, gpointer data)
@@ -277,19 +280,19 @@ static void CallbackForm1ChartEcgTimeActive(GtkWidget *widget, GdkEvent *event, 
 	pStrTime = (char *) gtk_entry_get_text(GTK_ENTRY(pViewDataPtr->pEntryChartEcgTime));    
 	UtilTimeMsGet(pStrTime, &iTimeMS);
 
-	iTimeMS = iTimeMS - (iTimeMS % 2);
+	iTimeMS = iTimeMS - (iTimeMS %2);
 	iMS = iTimeMS % 1000;
 	if(iMS > 0)
 	{
 		UtilTimeStrGet(iTimeMS, strTime2);
 		gtk_entry_set_text(GTK_ENTRY(pViewDataPtr->pEntryChartEcgTime), strTime2);    
 	}
+	
 	/// Set back to file time ms now
 	if((iTimeMS > 0) &&(iTimeMS < GlobalVar.iFileTimeMSTotal))
 	{
 		GlobalVar.iFileTimeMSNow = iTimeMS;
 	}
-
 	gtk_widget_queue_draw(widget);
 }
 
@@ -304,6 +307,7 @@ gint CallbackForm1Timer1 (gpointer data)
 gint CallbackForm1Timer2 (gpointer data)
 {
 	ViewDataForm1Type * pViewDataPtr = (ViewDataForm1Type * ) pThis->pViewData;
+
 	char strTime[256];
 	JINT iTimeMS = 0;
 	JDataSet *pDataSet = &GlobalVar.dataSet[DATASET_LOAD_ECG_DS0];
@@ -409,7 +413,6 @@ gboolean CallbackForm1DrawArea0 (GtkWidget *widget, cairo_t *cr, gpointer data)
 	
 	JFLOAT fTimeSec = -1;
 
-	
 	if(GlobalVar.bChartEcgRun == FALSE)
 	{
 		iTimeMSPre = -1;
@@ -489,7 +492,7 @@ static JINT LabelInit(void)
 	JINT iRow7  = FORM1_FRAME3_TOP  + FORM1_FRAME3_ROW * 8;
 	JINT iRow8  = FORM1_FRAME3_TOP  + FORM1_FRAME3_ROW * 9;
 
-	GtkStyleContext * pContent = NULL;
+	GtkStyleContext * pContext = NULL;
 
 	///-----------------------------------------------------------------------///
 	/// Label main
@@ -509,8 +512,8 @@ static JINT LabelInit(void)
 	x0 = FORM1_FRAME1_LEFT + FORM1_FRAME1_XGAP;
 	y0 = FORM1_FRAME1_TOP  + FORM1_FRAME1_ROW;  
 	pLabel =  gtk_label_new_with_mnemonic("Time:");	
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, "");  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, "");  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
   gtk_widget_show(pLabel);
@@ -521,8 +524,8 @@ static JINT LabelInit(void)
 	x0 = FORM1_FRAME1_LEFT + FORM1_FRAME1_XGAP + 220;
 	y0 = FORM1_FRAME1_TOP  + FORM1_FRAME1_ROW + 10;  
 	pLabel =  gtk_label_new_with_mnemonic("/");	
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, "label_time");  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, "label_time");  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
   gtk_widget_show(pLabel);
@@ -537,8 +540,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("DATE");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -553,8 +556,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -572,8 +575,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("TIME");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -588,8 +591,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -606,8 +609,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HR");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -622,8 +625,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -640,8 +643,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("TEMP");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -656,8 +659,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -674,8 +677,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("LEAD-OFF");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -690,8 +693,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -709,8 +712,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("GSEN-X");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -725,8 +728,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -742,8 +745,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("GSEN-Y");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -758,8 +761,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -776,8 +779,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("GSEN-Z");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -792,8 +795,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -810,8 +813,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("BATT-SOC");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -826,8 +829,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -844,8 +847,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("BAT-SEC");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -860,8 +863,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -878,8 +881,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-SDNN");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -894,8 +897,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -913,8 +916,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-NN50");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -929,8 +932,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -947,8 +950,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-RMSSD");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -963,8 +966,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -981,8 +984,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-RR");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -997,8 +1000,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1017,8 +1020,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-VLF");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1033,8 +1036,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1052,8 +1055,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-LF");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1068,8 +1071,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1086,8 +1089,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-HF");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1102,8 +1105,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1120,8 +1123,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-LFHF");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1136,8 +1139,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1155,8 +1158,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-TP");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1172,8 +1175,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1191,8 +1194,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-LFTP");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1207,8 +1210,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1225,8 +1228,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("HRV-HFTP");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_TITLE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_TITLE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1241,8 +1244,8 @@ static JINT LabelInit(void)
 	h  = 30;	
 		
 	pLabel = gtk_label_new_with_mnemonic("");
-	pContent = gtk_widget_get_style_context(pLabel);	
-	gtk_style_context_add_class(pContent, CSS_CLASS_LABEL_VALUE);  	
+	pContext = gtk_widget_get_style_context(pLabel);	
+	gtk_style_context_add_class(pContext, CSS_CLASS_LABEL_VALUE);  	
   gtk_widget_set_name(pLabel, "");  
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
 	gtk_widget_set_size_request(pLabel, w, h);  
@@ -1406,7 +1409,7 @@ static JINT FrameInit(void)
   JINT w  = 0;
   JINT h  = 0;
 	
-	GtkStyleContext *pContent = NULL;
+	GtkStyleContext *pContext = NULL;
 
 	///-----------------------------------------------------------------------///
 	/// Frame: File Browse
@@ -1417,14 +1420,14 @@ static JINT FrameInit(void)
   h  = FORM1_FRAME0_HEIGHT;
 
   pFrame = gtk_frame_new("Load File");
-	pContent = gtk_widget_get_style_context(pFrame);	
-	gtk_style_context_add_class(pContent, "frame_default");  
+	pContext = gtk_widget_get_style_context(pFrame);	
+	gtk_style_context_add_class(pContext, "frame_default");  
   gtk_frame_set_shadow_type(GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
   gtk_frame_set_label_align(GTK_FRAME (pFrame), 0.02, 0.5);
   gtk_widget_set_size_request(pFrame, w, h); 
   gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pFrame, x0, y0);
   gtk_widget_show(pFrame);
-	
+
 	///-----------------------------------------------------------------------///
 	/// Frame: Chart
 	///-----------------------------------------------------------------------///
@@ -1434,8 +1437,8 @@ static JINT FrameInit(void)
   h  = FORM1_FRAME1_HEIGHT;
 
   pFrame = gtk_frame_new("Control");
-	pContent = gtk_widget_get_style_context(pFrame);	
-	gtk_style_context_add_class(pContent, "frame_default");  	
+	pContext = gtk_widget_get_style_context(pFrame);	
+	gtk_style_context_add_class(pContext, "frame_default");  	
   gtk_frame_set_shadow_type(GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
   gtk_frame_set_label_align(GTK_FRAME (pFrame), 0.02, 0.5);
   gtk_widget_set_size_request(pFrame, w, h); 
@@ -1451,8 +1454,8 @@ static JINT FrameInit(void)
   h  = FORM1_FRAME2_HEIGHT;
 
   pFrame = gtk_frame_new("Ecg Chart");
-	pContent = gtk_widget_get_style_context(pFrame);	
-	gtk_style_context_add_class(pContent, "frame_default");  	
+	pContext = gtk_widget_get_style_context(pFrame);	
+	gtk_style_context_add_class(pContext, "frame_default");  	
   gtk_frame_set_shadow_type(GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
   gtk_frame_set_label_align(GTK_FRAME (pFrame), 0.02, 0.5);
   gtk_widget_set_size_request(pFrame, w, h); 
@@ -1468,8 +1471,8 @@ static JINT FrameInit(void)
   h  = FORM1_FRAME3_HEIGHT;
 
   pFrame = gtk_frame_new("Information");
-	pContent = gtk_widget_get_style_context(pFrame);	
-	gtk_style_context_add_class(pContent, "frame_default");  	
+	pContext = gtk_widget_get_style_context(pFrame);	
+	gtk_style_context_add_class(pContext, "frame_default");  	
   gtk_frame_set_shadow_type(GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
   gtk_frame_set_label_align(GTK_FRAME (pFrame), 0.02, 0.5);
   gtk_widget_set_size_request(pFrame, w, h); 

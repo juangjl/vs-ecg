@@ -1,7 +1,7 @@
 /**
  * @file Func.cpp
  *
- *  Function 
+ *  Function
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
@@ -23,7 +23,7 @@ JBOOL FuncBleOpenCheck(void)
 	///----------------------------------------------------------------///
 	iErrNo = CmdMBleConnectStatus(&GlobalVar.bBleConnected);
 	if(iRet != NO_ERR)
-	{
+	{		
 		GlobalVar.dwSysSta5 &= ~SYS_STA5_SERIAL_PORT_OPEN;		
 		return FALSE;
 	}
@@ -383,9 +383,7 @@ JBOOL FuncVscModeInit(void)
 JBOOL FuncVscModeStart(void)
 {
 	JINT iErrNo = NO_ERR;
-	char msg[256];
-	
-	GlobalVar.bVscMode = FALSE;
+	char msg[256];	
 
 	/// VSH101 VSC MODE Start
 	iErrNo = CmdSBleVscModeStart();
@@ -398,8 +396,7 @@ JBOOL FuncVscModeStart(void)
 
 	GlobalVar.bVscModeReadOn = FALSE;
 	GlobalVar.iBleState = BLE_STATE_VSC_MODE;
-
-	GlobalVar.bVscMode = TRUE;
+	
 
 	GlobalVar.dwVscModeSec =  0;
 
@@ -409,9 +406,7 @@ JBOOL FuncVscModeStart(void)
 JBOOL FuncVscModeStop(void)
 {
 	JINT iErrNo = NO_ERR;
-	char msg[256];
-
-	GlobalVar.bVscMode = FALSE;
+	char msg[256];	
 
 	/// VSH101 VSC MODE Start
 	iErrNo = CmdSBleVscModeStop();
@@ -915,6 +910,37 @@ JBOOL FuncVscInfoDataLoad(char *pFilePath)
 	
 	sprintf(msg, "[LOAD][INFO] INFO_COUNT = %d (sec)\r\n", GlobalVar.iVscInfoCnt );
 	DBG_PRINTF(msg);
+
+	return TRUE;
+}
+
+JBOOL FuncAtrDataLoad(AtrCtlType *pAtrCtl, char *pFilePath)
+{
+	char msg[256];
+
+	///------------------------------------------------------------------------------------///
+	/// Check file existed
+	///------------------------------------------------------------------------------------///
+	if(UtilFileExisted(pFilePath) == FALSE)
+	{
+		sprintf(msg, "[LOAD][ATR] %s is not existed\r\n", pFilePath);
+		DBG_PRINTF(msg);
+		return FALSE;
+	}
+	
+	sprintf(msg, "%s", "[ATR] hihi\r\n");
+	DBG_PRINTF(msg);
+
+	AtrCtlLoad(pAtrCtl, pFilePath);
+
+	return TRUE;
+}
+
+JBOOL FuncVscAtrInit(void)
+{
+	AtrCtlInit(&AtrCtlBle);
+	GlobalVar.iVscAtrCnt     = 0;
+	GlobalVar.bVscAtrUpdated = FALSE;
 
 	return TRUE;
 }

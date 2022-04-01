@@ -527,7 +527,7 @@ JINT CmdSBleVscModeStop(void)
   {
     printf("[ERROR] VSC_MODE_STOP NACK\r\n");
     iErrNo = ERR_WRONG_ARG_FORMAT;
-  }	
+  }
   return iErrNo;
 }
 
@@ -555,7 +555,7 @@ JINT CmdSBleVscModeRead(void)
   PacketOut.wMOSILen 	= 2;
   PacketOut.wMISOLen 	= 968;
   
-  *(JWORD *)&PacketOut.bData[0] = VscMode.wId;
+  *(JWORD *)&PacketOut.bData[0] = VscModeCtl.wId;
 
   /// slave packet Cmd
 	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
@@ -572,7 +572,7 @@ JINT CmdSBleVscModeRead(void)
 		return iErrNo;
 	}
 
-	if(VscMode.wId != PacketIn.wDataIdx)
+	if(VscModeCtl.wId != PacketIn.wDataIdx)
 	{
 		sprintf(msg, "\t\t [BLE][WARNING] BLE_VSC_MODE_READ ID = %d\r\n", PacketIn.wDataIdx);
 		DBG_PRINTF(msg);				
@@ -584,15 +584,15 @@ JINT CmdSBleVscModeRead(void)
 	wLen = PacketIn.wDataLen;
 	
 	VscModeDecode(wId, wLen, (JBYTE *)&PacketIn.bData[0]);
-
+  
   /// copy to main
   pVscMode = &GlobalVar.vscModeArr[GlobalVar.iVscModeArrIdx];
-  UtilMemcpy((JBYTE *)pVscMode, (JBYTE *)&VscMode, sizeof(VscModeControlType));
+  UtilMemcpy((JBYTE *)pVscMode, (JBYTE *)&VscModeCtl, sizeof(VscModeControlType));
 
   GlobalVar.iVscModeArrIdx = (GlobalVar.iVscModeArrIdx + 1) % VSC_MODE_ARR_LEN;
   GlobalVar.bVscModeAdded = TRUE;
 	
-	VscMode.wId = (VscMode.wId + 1) % VSC_MODE_IDX_MAX;		
+	VscModeCtl.wId = (VscModeCtl.wId + 1) % VSC_MODE_IDX_MAX;		
   return iErrNo;
 }
 
@@ -647,9 +647,13 @@ JINT CmdSBleSRegRead(SRegType *pSReg)
 	
   /// SReg Name Set
   UtilMemcpy((JBYTE *) &PacketOut.bData[0],(JBYTE *)pSReg, SREG_NAME_SIZE);
-    
+
+
+  DBG_PRINTF("SREG-READ:START\r\n");  
   /// Slave packet Cmd Send
 	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
+
+  DBG_PRINTF("SREG-READ:END\r\n");  
 
 	if(PacketIn.bAck != 'A')
   {

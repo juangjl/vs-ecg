@@ -1,7 +1,7 @@
 /**
- * @file blestate.c
+ * @file BleControl.cpp
  *
- *  ble.h 
+ *  BleControl.cpp
  *
  *
  * @version $Revision$
@@ -67,7 +67,7 @@ void BleControlCheck(void)
 		/// BLE Open
 		CmdMBleOpen(&GlobalVar.bBleMacAddr[0]);
 
-		GlobalVar.iBleState = BLE_STATE_WAIT;
+		GlobalVar.iBleState		= BLE_STATE_WAIT;
 		GlobalVar.iBleOpenSec	= 0;
 
 		sprintf(msg, "STR = %s\r\n", strMacAddr);

@@ -51,12 +51,15 @@ extern void 	UtilFileNameGet(char *strFilePath, char *pFileName);
 extern JINT 	UtilTimeStrGet(JINT iTimeMS, char *strTime);
 extern JINT 	UtilTimeMsGet(char *strTime,  JINT *pTimeMS);
 
+extern long   UtilMsGet(void);
 
 extern void 	UtilLocalTime(JTM *pJTM, time_t t);
 
 extern void 	UtilCurDirGet(char * pCurrDir);
 
 extern void   UtilTimeFolderCreate(char * pDataDir, JTM *pJTM, char * pTimeFolder);
+
+extern void   UtilTimeStringGet(JFLOAT fTime, char *strTime);
 
 extern void   JTMTimeZoneSecSet(JTM *pJTM, JINT iTimeZoneSec);
 extern void 	JTMLocalTimeGet(JTM *pJTM, time_t tNow);

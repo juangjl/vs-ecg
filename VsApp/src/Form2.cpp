@@ -386,11 +386,11 @@ gint CallbackForm2Timer1 (gpointer data)
 	///---------------------------------------------------------------------------///
 	/// UI: Serial Port OPEN Failed
 	///---------------------------------------------------------------------------///
-	if(GlobalVar.dwSysCtl7 & SYS_CTL7_MSG_SERIAL_POR_OPEN_FAILED)
+	if(GlobalVar.dwSysCtl7 & SYS_CTL7_MSG_SERIAL_PORT_OPEN_FAILED)
 	{
 		sprintf(msg, "%s", "Failed to open serial port");
 		MESSAGE_BOX(msg);
-		GlobalVar.dwSysCtl7 &=~SYS_CTL7_MSG_SERIAL_POR_OPEN_FAILED;
+		GlobalVar.dwSysCtl7 &=~SYS_CTL7_MSG_SERIAL_PORT_OPEN_FAILED;
 	}
 
 	iSec = (iSec + 1) % 1000;

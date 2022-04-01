@@ -15,24 +15,24 @@
 
 gboolean CallbackJViewDialogMessageDelete(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
-	printf("reponse\r\n");
+	// printf("reponse\r\n");
   gtk_widget_destroy(GTK_WIDGET(widget));
 	return TRUE;
 }
 
 void JViewButtonDisable(GtkWidget *pButton)
 {
-	//GtkStyleContext *context = NULL;
-	//context = gtk_widget_get_style_context(pButton);	
-	//gtk_style_context_add_class(context, CSS_CLASS_BUTTON_DISABLED);
+	//GtkStyleContext *pContext = NULL;
+	//pContext = gtk_widget_get_style_context(pButton);	
+	//gtk_style_context_add_class(pContext, CSS_CLASS_BUTTON_DISABLED);
 	gtk_widget_set_sensitive(pButton, FALSE);
 }
 
 void JViewButtonEnable(GtkWidget *pButton)
 {
-	//GtkStyleContext *context = NULL;
-	//context = gtk_widget_get_style_context(pButton);	
-	//gtk_style_context_remove_class(context, CSS_CLASS_BUTTON_DISABLED);
+	//GtkStyleContext *pContext = NULL;
+	//pContext = gtk_widget_get_style_context(pButton);	
+	//gtk_style_context_remove_class(pContext, CSS_CLASS_BUTTON_DISABLED);
 	gtk_widget_set_sensitive(pButton, TRUE);		
 }
 

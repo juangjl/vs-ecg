@@ -461,6 +461,14 @@ JINT UtilTimeMsGet(char *strTime,  JINT *pTimeMS)
 	return TRUE;
 }
 
+long UtilMsGet(void)
+{
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	long int ms = tp.tv_sec * 1000 +  tp.tv_usec / 1000;
+	return ms;
+}
+
 void UtilLocalTime(JTM *pJTM, time_t t)
 {
 	struct tm tmNow  = *localtime(&t);
@@ -553,3 +561,16 @@ JINT UtilGetch(void)
 	return ch;
 }
 
+void UtilTimeStringGet(JFLOAT fTime, char *strTime)
+{
+	JINT iMSTotal  	= (JINT) (fTime * 1000);
+	JINT iMS  		  = (iMSTotal % 1000);
+	JINT iSecTotal  = ((iMSTotal  - iMS)) / 1000;	
+
+	JINT iSec      	= (iSecTotal) % 60;	
+	JINT iMinTotal 	= (iSecTotal - iSec) / 60;		
+	JINT iMin		 		= (iMinTotal) % 60;		
+	JINT iHour 			= (iMinTotal - iMin) / 60;		
+
+	sprintf(strTime, "%02d:%02d:%02d_%03d", iHour, iMin, iSec, iMS);
+}

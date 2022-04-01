@@ -85,7 +85,7 @@ static JINT FrameInit(void)
   JINT w  = 0;
   JINT h  = 0;
 	
-	GtkStyleContext *pContent = NULL;
+	GtkStyleContext *pContext = NULL;
 
 	
   return iRet;  

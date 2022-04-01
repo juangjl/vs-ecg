@@ -90,6 +90,7 @@
 #define SYS_CTL2_TIMER_10MS_EVT					  (1<<21)
 #define SYS_CTL2_TIMER_20MS_EVT					  (1<<22)
 
+#define SYS_CTL2_TASK_ISR			  					(1<<30) 
 
 #endif ///<  __DEFINE_H__
 

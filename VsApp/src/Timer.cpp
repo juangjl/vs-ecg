@@ -1,11 +1,11 @@
 /**
  * @file Timer.cpp
  *
- *  Timer control function
+ *  Timer and time function
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
- * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd.,, all rights reserved.
+ * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  * @note
 */
 ///------------------------------------------///
@@ -20,36 +20,31 @@ void TimerTick(void)
 	JINT iTime00MS  = 0;
 
 	time_t  t 		= time(NULL);
-  struct tm tm 	= *localtime(&t);
-  
-	struct timeval tp;
-	gettimeofday(&tp, NULL);
-	
-	long int iMS = tp.tv_usec / 1000;
-
-	GlobalVar.iTimeMS = iMS;
+  struct tm tm 	= *localtime(&t);	
+	GlobalVar.iTimeMS 	= GlobalVar.iTimeMS  + TIMER_PERIOD_MS;
 	if(GlobalVar.iTimeMS < 0)
 	{
 		GlobalVar.iTimeMS = 0;	
 	}
-
-	///-----------------------------------------------------------------------///
-	/// 000/ 100/ 200/ 300/ 400/ 500/ 600/ 700/ 800/ 900
-	///-----------------------------------------------------------------------///
-	iTime100MS = (iMS - (iMS % 100)) % 1000;	
-	if(GlobalVar.iTime100MS != iTime100MS)
+	if((GlobalVar.iTimeMS % 100) == 0)
 	{
-		GlobalVar.iTime100MS = iTime100MS;		
-		UtilLocalTime(&GlobalVar.jtm, t);
-	}	
+		///-----------------------------------------------------------------------///
+		/// 000/ 100/ 200/ 300/ 400/ 500/ 600/ 700/ 800/ 900
+		///-----------------------------------------------------------------------///
+		GlobalVar.iTime100MS  = GlobalVar.iTime100MS  + 100;		
+	}
 	///-----------------------------------------------------------------------///
 	/// 00/ 10/ 20 / 30/ 40/ 50/ 60/ 70/ 80
-	///-----------------------------------------------------------------------///
-	iTime10MS = (iMS - (iMS % 10)) % 100;		
-	if(GlobalVar.iTime10MS != iTime10MS)
+	///-----------------------------------------------------------------------///			
+	if((GlobalVar.iTimeMS % 10) == 0)
+	{		
+		GlobalVar.iTime10MS = GlobalVar.iTime10MS + 10;			
+	}
+	if((GlobalVar.iTimeMS  % TASK_PERIOD_MS) == 0)
 	{
-		GlobalVar.iTime10MS = iTime10MS;			
-	}	
+		UtilLocalTime(&GlobalVar.jtm, t);
+		GlobalVar.dwSysCtl2 |= SYS_CTL2_TASK_ISR;
+	}
 }
 
 void TimerEventSet()
@@ -115,7 +110,7 @@ void TimerEventSet()
 	if(GlobalVar.iTime10MS != GlobalVar.iTime10MSPre)			
 	{
 		GlobalVar.iTime10MSPre = GlobalVar.iTime10MS;
-		GlobalVar.dwSysCtl2 |= SYS_CTL2_TIMER_10MS_EVT;		
+		GlobalVar.dwSysCtl2 |= SYS_CTL2_TIMER_10MS_EVT;				
 
 		if((GlobalVar.iTime10MS  % 20) == 0)
 		{
@@ -199,7 +194,7 @@ void TimerEventClear(void)
 	/// Timer : 100ms  / 10 ms
 	///----------------------------------------------------------------///
 	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_100MS_EVT);				
-	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_10MS_EVT);	
+	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_10MS_EVT);	`			
 	GlobalVar.dwSysCtl2 &= ~(SYS_CTL2_TIMER_20MS_EVT);																				
 }
 

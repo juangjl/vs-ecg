@@ -69,6 +69,14 @@
 #define FORM6_FRAME6_YGAP								(20)
 #define FORM6_FRAME6_ROW								(30 + FORM6_FRAME6_YGAP)
 
+#define FORM6_FRAME7_LEFT								(520)
+#define FORM6_FRAME7_TOP								(460)
+#define FORM6_FRAME7_WIDTH							(480)
+#define FORM6_FRAME7_HEIGHT							(120)
+#define FORM6_FRAME7_XGAP								(20)
+#define FORM6_FRAME7_YGAP								(20)
+#define FORM6_FRAME7_ROW								(30 + FORM6_FRAME7_YGAP)
+
 
 typedef struct ViewDataForm6ST
 {
@@ -94,6 +102,8 @@ typedef struct ViewDataForm6ST
 	GtkWidget * pLabelLeadOffCompThreshold;
 
   GtkWidget * pLabelLeadOffCurrent;
+  
+	GtkWidget * pLabelMeasMotionMode;
   
 	///--------------------------------------------------------///
 	/// Text (Entry)
@@ -123,11 +133,19 @@ typedef struct ViewDataForm6ST
 		
 	GtkWidget * pBtnMeasLeadOffGet;
 	GtkWidget * pBtnMeasLeadOffEnable;
-	GtkWidget * pBtnMeasLeadOffDisable;  
+	GtkWidget * pBtnMeasLeadOffDisable;
+  
 	GtkWidget * pBtnMeasLeadOffCompThresholdSet;
 	GtkWidget * pBtnMeasLeadOffCompThresholdGet;
-	GtkWidget * pBtnMeasLeadOffCurrSet;
+
+  GtkWidget * pBtnMeasLeadOffCurrSet;
 	GtkWidget * pBtnMeasLeadOffCurrGet;
+
+  GtkWidget * pBtnMeasMotionModeGet;
+	GtkWidget * pBtnMeasMotionModeEnable;
+	GtkWidget * pBtnMeasMotionModeDisable;
+  
+	
 	///--------------------------------------------------------///
 	/// Frame (group)
 	///--------------------------------------------------------///

@@ -11,8 +11,6 @@
 #ifndef __VSC_MODE_H__
 #define __VSC_MODE_H__ 
 
-#define VSC_MODE_ARR_LEN                						(10)
-
 #define VSC_MODE_INFO_TYPE													(0)
 
 #define VSC_MODE_INFO_TYPE0_TIME_UTC								(1)
@@ -44,13 +42,17 @@
 #define VSC_MODE_INFO_TYPE0_GSEN_DATA6              (25) ///< GS_X4 |  GS_Y4
 #define VSC_MODE_INFO_TYPE0_GSEN_DATA7              (26) ///< GS_Z4 |  --
 
+#define VSC_MODE_INFO_TYPE0_ATR				              (27) ///< ATR
+
+
+
 #define VSC_MODE_IDX_INVALID				 (8000)
 #define VSC_MODE_IDX_MAX						 (1000)
 
 #define VSC_MODE_ITEM_DATA_SIZE      (800)  ///< 200 ms 
 #define VSC_MODE_ITEM_INFO_SIZE      (168)  ///< 42 information
 
-#define VSC_MODE_ITEM_INFO_COUNT     (VSC_MODE_ITEM_INFO_SIZE / 4)  ///< 104 / 4 =  26
+#define VSC_MODE_ITEM_INFO_COUNT     (VSC_MODE_ITEM_INFO_SIZE / 4)  ///< 168 / 4 =  42
 
 typedef struct VscModeItemType
 {
@@ -81,6 +83,7 @@ typedef struct VscModeControlSt
 	char 		strFileNameGSensor[512];
 	char 		strFileNameData[VSC_MODE_CAHNNEL_COUNT][512];
 	JFLOAT 	fValueCH[VSC_MODE_CAHNNEL_COUNT][VSC_MODE_CAHNNEL_DATA_COUNT];
+
 	VscModeItemType item;
 	
 	JTM 		jtm;						///< 0 :
@@ -102,28 +105,30 @@ typedef struct VscModeControlSt
 	JFLOAT 	fHrvLF;					///< 15 : 
 	JFLOAT 	fHrvHF;					///< 16 : 
 	
+	JFLOAT 	fHrvLFHF;				///<
+	JFLOAT 	fHrvTP;					///<
+	JFLOAT 	fHrvLFTP;				///<
+	JFLOAT 	fHrvHFTP;				///<
 
 	JFLOAT 	fBar;						///< 17 :
 	JFLOAT 	fBarTemp;				///< 18 :
 
-	JSHORT  sGSenX[5];			///	 19~26
-	JSHORT  sGSenY[5];			///	 19~26
-	JSHORT  sGSenZ[5];			///	 19~26
-	
-	
-	JFLOAT 	fHrvLFHF;				///<  :
-	JFLOAT 	fHrvTP;					///<  : 
-	JFLOAT 	fHrvLFTP;				///<  :
-	JFLOAT 	fHrvHFTP;				///<  :	
+	JSHORT  sGSenX[5];			///< 19~26 :
+	JSHORT  sGSenY[5];			///< 19~26 : 
+	JSHORT  sGSenZ[5];			///< 19~26 : 
 
+	JAtrType atrNow;				///< 27 :	
 } VscModeControlType;
 
-extern VscModeControlType VscMode;
+extern VscModeControlType VscModeCtl;
 
 extern void VscModeFileNameSet(VscModeControlType *pVscMode);
 extern void VscModeSave(VscModeControlType *pVscMode);
 extern void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData);
 extern void VscModeInit(char *pBaseFolder);
+
+extern void VscModeAtrBinSave(void);
+extern void VscModeAtrCsvSave(void);
 
 #endif ///<  __VSC_MODE_H__
 
