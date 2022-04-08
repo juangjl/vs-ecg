@@ -117,11 +117,11 @@ void VscModeInfoParse(VscModeControlType *pVscMode)
 
 	/// VSC_MODE_INFO_TYPE0_ATR               			(27) ///< ATR	CODE		
 	pAtrRead = &pVscMode->atrNow;	
-	UtilMemcpy((JBYTE *)&pAtrRead->bAtr, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR], 1);	
+	UtilMemcpy((JBYTE *)&pAtrRead->bAtr, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR], 1);
 
 	/// VSC_MODE_INFO_TYPE0_ATR_TIME               	(28) ///< ATR	TIME		
 	pAtrRead = &pVscMode->atrNow;	
-	UtilMemcpy((JBYTE *)&pAtrRead->dwMS, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR_TIME], 4);	
+	UtilMemcpy((JBYTE *)&pAtrRead->dwMS, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR_TIME], 4);
 
 	if(pAtrRead->bAtr != ATR_NONE)
 	{	
@@ -179,7 +179,7 @@ void VscModeInfoHeaderSave(FILE *fp)
 	/// MONTH
 	fprintf(fp, "%s", "MONTH,");
 	/// DAY
-	fprintf(fp, "%s", "MONTH,");	
+	fprintf(fp, "%s", "DAY,");	
 	/// HOUR
 	fprintf(fp, "%s", "HOUR,");		
 	/// MIN
@@ -252,31 +252,8 @@ void VscModeInfoHeaderSave(FILE *fp)
 	fprintf(fp, "%s", "\n");				
 }
 
-void VscModeInfoSave(VscModeControlType *pVscMode)
+void VscModeInfoDataSave(VscModeControlType *pVscMode, FILE *fp)
 {
-	char msg[256];
-		
-	FILE *fp = NULL;	
-	JBOOL bHeaderGen = FALSE;
-
-	if(UtilFileExisted(GlobalVar.strVscFileNameInfo) == FALSE)
-	{
-		bHeaderGen = TRUE;
-	}
-	
-	fp  = fopen(GlobalVar.strVscFileNameInfo, "a+");
-	if(fp == NULL)
-	{
-		sprintf(msg, "\t\t [VSC][ERROR][INFO] Failed to open %s\r\n", GlobalVar.strVscFileNameInfo);
-		DBG_PRINTF(msg);		
-		return;
-	}
-	
-	if(bHeaderGen == TRUE)
-	{
-		VscModeInfoHeaderSave(fp);
-	}
-
 	/// YEAR
 	fprintf(fp, "%04d,", pVscMode->jtm.iYear);
 	/// MONTH
@@ -352,7 +329,36 @@ void VscModeInfoSave(VscModeControlType *pVscMode)
 	fprintf(fp, "%0.3f,", pVscMode->fHrvLFHF);
 
 
-	fprintf(fp, "%s", "\n");				
+	fprintf(fp, "%s", "\n");		
+}
+
+void VscModeInfoSave(VscModeControlType *pVscMode)
+{
+	char msg[256];
+		
+	FILE *fp = NULL;	
+	JBOOL bHeaderGen = FALSE;
+
+	if(UtilFileExisted(GlobalVar.strVscFileNameInfo) == FALSE)
+	{
+		bHeaderGen = TRUE;
+	}
+	
+	fp  = fopen(GlobalVar.strVscFileNameInfo, "a+");
+	if(fp == NULL)
+	{
+		sprintf(msg, "\t\t [VSC][ERROR][INFO] Failed to open %s\r\n", GlobalVar.strVscFileNameInfo);
+		DBG_PRINTF(msg);		
+		return;
+	}
+	
+	if(bHeaderGen == TRUE)
+	{
+		VscModeInfoHeaderSave(fp);
+	}
+
+	VscModeInfoDataSave(pVscMode, fp);
+		
 	fclose(fp);
 }
 

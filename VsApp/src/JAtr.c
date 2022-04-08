@@ -148,7 +148,7 @@ JBOOL JAtrFileCsvSave(char * strFileName, JINT idx, JDWORD A, JFLOAT fTimeSec, J
 }
 
 void JAtrDataGet(JAtrType *pAtr, JINT *piAtr, JFLOAT *pfTimeSec)
-{    
+{
   *pfTimeSec = (JFLOAT)pAtr->dwMS / 1000;
   *piAtr     = (JINT)pAtr->bAtr;
 }
@@ -169,12 +169,12 @@ void JAtrDataPrint(JAtrType *pAtr)
 void JAtrDataClean(JAtrType *pAtr)
 {
   pAtr->bAtr  = ATR_NONE;
-  pAtr->dwMS  = 0;
+  pAtr->dwMS  = 0;  
 }
 
 JINT JAtrSizeGet(JAtrQueueType * pAtrQueue)
 {
-  return pAtrQueue->iAtrCnt;
+   return pAtrQueue->iAtrCnt;
 }
 
 JBOOL JAtrFullCheck(JAtrQueueType * pAtrQueue)
