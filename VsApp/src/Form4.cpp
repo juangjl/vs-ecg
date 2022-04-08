@@ -5,13 +5,14 @@
  *
  * @version $Revision$
  * @author JLJuang <jl_juang@vsigntek.com>
- * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd.,, all rights reserved.
+ * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  * @note
 */
 ///------------------------------------------///
 ///  Include Area
 ///------------------------------------------///
 #include "Global.h"
+
 #include "Form4.h"
 
 ViewDataForm4Type  	ViewDataForm4;
@@ -109,8 +110,13 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 		fAtrTimeSecPre = 0;
 	}
 
-	//sprintf(msg, "ATR total = %d,  find_cnt = %d, sec0 = %0.3f, sec1=%0.3f\r\n", pAtrCtl->iAtrDataCnt, pAtrFind->iCnt, pAtrFind->fTimeSec0, pAtrFind->fTimeSec1);
-	//DBG_PRINTF(msg);
+#if 1
+	if(pAtrFind->iCnt > 0)
+	{
+		sprintf(msg, "\t [ATR] ATR total = %d,  find_cnt = %d, sec0 = %0.3f, sec1=%0.3f\r\n", pAtrCtl->iAtrDataCnt, pAtrFind->iCnt, pAtrFind->fTimeSec0, pAtrFind->fTimeSec1);
+		DBG_PRINTF(msg);
+	}
+#endif	
 
 	for(i = 0 ; i < pAtrFind->iCnt; i = i + 1)
 	{

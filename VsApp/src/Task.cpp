@@ -78,9 +78,10 @@ void TaskBleSReg(void)
 
 	if(GlobalVar.bSRegWrite == TRUE)
 	{
-		SRegWrite(pSReg);
-		sprintf(msg, "SREG_WRITE -> %s\r\n", pSReg->strName);		
+		sprintf(msg, "SREG_WRITE -> %s\r\n", pSReg->strName);
+		
 		DBG_PRINTF(msg);
+		SRegWrite(pSReg);
 	}
 	else
 	{		
@@ -166,7 +167,7 @@ void MainLoop()
 		TaskBleState();
 		
 		TaskRoundEnd();		
-
+		
 		if(GlobalVar.bAppExit == TRUE)
 		{
 			break;
@@ -287,7 +288,7 @@ void SubBleVscAtr(void)
 		JAtrDataGet(&GlobalVar.vscAtrNow, &A, &fTimeSec);
 
     AtrCtlVscModeAdd(pAtrCtl, A, fTimeSec);
-		
+
     /// check the atr data save  
 		if(GlobalVar.bVscModeSave == TRUE)
 		{

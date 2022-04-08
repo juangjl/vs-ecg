@@ -105,6 +105,41 @@ JBOOL AtrAbbrevGet(JDWORD dwA, char * pAbbrev, JDWORD *pdwColor)
   return TRUE;
 }
 
+JBOOL AtrCsvFileSave(char * strFileName, JINT idx, JDWORD A, JFLOAT fTimeSec, JFLOAT fDeltaSec)
+{
+	JBOOL bRet = FALSE;	
+	bRet = AtrWrite(idx, A, fTimeSec, fDeltaSec, (char *) &strFileName[0]);		
+	return bRet;
+}
+
+JBOOL AtrBinFileSave(char * strFileName, JINT idx, JDWORD A, JFLOAT fTimeSec, JFLOAT fDeltaSec)
+{
+	JBOOL bRet = FALSE;
+	FILE *fp = NULL;
+	char msg[256];  
+
+	if(idx == 1)
+	{
+		fp = fopen(strFileName, "wb+");
+	}
+	else
+	{
+		fp = fopen(strFileName, "ab+");
+	}
+	if(fp == NULL)
+	{
+		sprintf(msg, "[ERROR][ATR][SAVE] Failed to open %s\r\n", strFileName);
+		DBG_PRINTF(msg);
+	}
+	else
+	{
+		fwrite(&A, 4, 1, fp);
+		fwrite(&fTimeSec, 4, 1, fp);
+		fclose(fp);
+	}			
+	return bRet;
+}
+
 JBOOL AtrCtlLoad(AtrCtlType *pAtrCtl, char * strFileName)
 {
   FILE *fp = NULL;
