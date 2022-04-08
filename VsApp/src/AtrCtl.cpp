@@ -105,12 +105,6 @@ JBOOL AtrAbbrevGet(JDWORD dwA, char * pAbbrev, JDWORD *pdwColor)
   return TRUE;
 }
 
-JBOOL AtrCsvFileSave(char * strFileName, JINT idx, JDWORD A, JFLOAT fTimeSec, JFLOAT fDeltaSec)
-{
-	JBOOL bRet = FALSE;	
-	bRet = AtrWrite(idx, A, fTimeSec, fDeltaSec, (char *) &strFileName[0]);		
-	return bRet;
-}
 
 JBOOL AtrBinFileSave(char * strFileName, JINT idx, JDWORD A, JFLOAT fTimeSec, JFLOAT fDeltaSec)
 {
