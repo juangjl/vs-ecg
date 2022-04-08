@@ -119,7 +119,7 @@ void VscModeInfoParse(VscModeControlType *pVscMode)
 	pAtrRead = &pVscMode->atrNow;	
 	UtilMemcpy((JBYTE *)&pAtrRead->bAtr, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR], 1);	
 
-	/// VSC_MODE_INFO_TYPE0_ATR_TIME               			(27) ///< ATR	TIME		
+	/// VSC_MODE_INFO_TYPE0_ATR_TIME               	(28) ///< ATR	TIME		
 	pAtrRead = &pVscMode->atrNow;	
 	UtilMemcpy((JBYTE *)&pAtrRead->dwMS, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR_TIME], 4);	
 
