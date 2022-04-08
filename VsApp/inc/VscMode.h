@@ -42,7 +42,8 @@
 #define VSC_MODE_INFO_TYPE0_GSEN_DATA6              (25) ///< GS_X4 |  GS_Y4
 #define VSC_MODE_INFO_TYPE0_GSEN_DATA7              (26) ///< GS_Z4 |  --
 
-#define VSC_MODE_INFO_TYPE0_ATR				              (27) ///< ATR
+#define VSC_MODE_INFO_TYPE0_ATR				              (27) ///< ATR CODE
+#define VSC_MODE_INFO_TYPE0_ATR_TIME	              (28) ///< ATR TIME
 
 
 

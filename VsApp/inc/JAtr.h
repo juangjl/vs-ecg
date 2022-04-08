@@ -221,8 +221,8 @@
 
 typedef struct JAtrSt
 {    
-  JBYTE bAtr;  
-  JBYTE bMS[3];
+  JBYTE   bAtr;  
+  JDWORD  dwMS;
 } JAtrType;
 
 #define ATR_QUEUE_CNT  (128)

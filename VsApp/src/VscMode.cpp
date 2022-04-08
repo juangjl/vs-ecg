@@ -115,9 +115,14 @@ void VscModeInfoParse(VscModeControlType *pVscMode)
 	UtilMemcpy((JBYTE *)&psGSData[0], (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_GSEN_DATA7], 4);
 	pVscMode->sGSenZ[4] = psGSData[0];
 
-	/// VSC_MODE_INFO_TYPE0_ATR               			(27) ///< ATR			
+	/// VSC_MODE_INFO_TYPE0_ATR               			(27) ///< ATR	CODE		
 	pAtrRead = &pVscMode->atrNow;	
-	UtilMemcpy((JBYTE *)pAtrRead, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR], 4);	
+	UtilMemcpy((JBYTE *)&pAtrRead->bAtr, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR], 1);	
+
+	/// VSC_MODE_INFO_TYPE0_ATR_TIME               			(27) ///< ATR	TIME		
+	pAtrRead = &pVscMode->atrNow;	
+	UtilMemcpy((JBYTE *)&pAtrRead->dwMS, (JBYTE *)&pItem->fInfo[VSC_MODE_INFO_TYPE0_ATR_TIME], 4);	
+
 	if(pAtrRead->bAtr != ATR_NONE)
 	{	
 		///--------------------------------------------------------------------------------///	

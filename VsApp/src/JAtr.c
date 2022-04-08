@@ -148,23 +148,18 @@ JBOOL JAtrFileCsvSave(char * strFileName, JINT idx, JDWORD A, JFLOAT fTimeSec, J
 }
 
 void JAtrDataGet(JAtrType *pAtr, JINT *piAtr, JFLOAT *pfTimeSec)
-{
-  JDWORD dwTimeMS = 0;
-  UtilMemcpy((JBYTE *)&dwTimeMS, &pAtr->bMS[0], 3);
-
-  *pfTimeSec = (JFLOAT)dwTimeMS / 1000;
+{    
+  *pfTimeSec = (JFLOAT)pAtr->dwMS / 1000;
   *piAtr     = (JINT)pAtr->bAtr;
 }
 
 void JAtrDataPrint(JAtrType *pAtr)
 {
-  char msg[256];
-  JDWORD dwTimeMS = 0;
+  char msg[256];  
   JFLOAT fTimeSec = 0;
   char strTime[256];
-
-  UtilMemcpy((JBYTE *)&dwTimeMS, &pAtr->bMS[0], 3);
-  fTimeSec = (JFLOAT)dwTimeMS / 1000;
+  
+  fTimeSec = (JFLOAT)pAtr->dwMS / 1000;
   UtilTimeStringGet(fTimeSec, strTime);
 
   //sprintf(msg, "\t [ATR][DATA] %-10s (%d) - %s\r\n", JAtrLabel[pAtr->bAtr], pAtr->bAtr, strTime);
@@ -173,10 +168,8 @@ void JAtrDataPrint(JAtrType *pAtr)
 
 void JAtrDataClean(JAtrType *pAtr)
 {
-  pAtr->bAtr    = ATR_NONE;
-  pAtr->bMS[0]  = 0;
-  pAtr->bMS[1]  = 0;
-  pAtr->bMS[2]  = 0;
+  pAtr->bAtr  = ATR_NONE;
+  pAtr->dwMS  = 0;
 }
 
 JINT JAtrSizeGet(JAtrQueueType * pAtrQueue)
@@ -221,7 +214,7 @@ void JAtrRead(JAtrQueueType * pAtrQueue,  JAtrType *pAtrRead)
   pAtr = &pAtrQueue->pAtrData[pAtrQueue->iAtrQueueHead];
 
   pAtrRead->bAtr = pAtr->bAtr;
-  UtilMemcpy(&pAtrRead->bMS[0], (JBYTE *)&pAtr->bMS[0], 3);  
+  pAtrRead->dwMS = pAtr->dwMS;  
 }
 
 void JAtrReadOut(JAtrQueueType * pAtrQueue,  JAtrType *pAtrRead)
@@ -247,7 +240,7 @@ void JAtrAdd(JAtrQueueType * pAtrQueue, JINT  iAtr, JFLOAT fTimeSec)
   }
   pAtr = &pAtrQueue->pAtrData[pAtrQueue->iAtrQueueTail];
   pAtr->bAtr = bAtr;
-  UtilMemcpy(&pAtr->bMS[0], (JBYTE *)&dwTimeMS, 3);
+  pAtr->dwMS = dwTimeMS;
 
   pAtrQueue->iAtrQueueTail = (pAtrQueue->iAtrQueueTail + 1) % ATR_QUEUE_CNT;
   pAtrQueue->iAtrCnt =  pAtrQueue->iAtrCnt + 1;
@@ -267,7 +260,7 @@ void JAtrAddEx(JAtrQueueType * pAtrQueue, JAtrType *pAtrNew)
 
   pAtr = &pAtrQueue->pAtrData[pAtrQueue->iAtrQueueTail];
   pAtr->bAtr = pAtrNew->bAtr;
-  UtilMemcpy(&pAtr->bMS[0], (JBYTE *)&pAtrNew->bMS[0], 3);
+  pAtr->dwMS = pAtrNew->dwMS;
 
   pAtrQueue->iAtrQueueTail = (pAtrQueue->iAtrQueueTail + 1) % ATR_QUEUE_CNT;
   pAtrQueue->iAtrCnt =  pAtrQueue->iAtrCnt + 1;

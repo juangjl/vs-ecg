@@ -137,7 +137,7 @@ void * ThreadVscMode(void *arg)
 		}
 	}
 	
-	DBG_PRINTF("VSM Bye byte\r\n");
+	DBG_PRINTF("Vsc Mode thread leave\r\n");
 
 	GlobalVar.tid0 = NULL;
 	pthread_exit(NULL);
