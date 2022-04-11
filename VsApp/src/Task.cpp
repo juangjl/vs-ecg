@@ -277,8 +277,8 @@ void SubBleVscAtr(void)
 		}
 		pAtrRead = &GlobalVar.vscAtrQueue[GlobalVar.iVscAtrQueueHead];
 
-		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrPre, (JBYTE *)&GlobalVar.vscAtrNow, 4);	
-		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrNow, (JBYTE *)pAtrRead, 4);		
+		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrPre, (JBYTE *)&GlobalVar.vscAtrNow,  sizeof(JAtrType));	
+		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrNow, (JBYTE *)pAtrRead,  sizeof(JAtrType));		
     
 		JAtrDataPrint(&GlobalVar.vscAtrNow);		
 

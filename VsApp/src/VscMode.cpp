@@ -133,7 +133,7 @@ void VscModeInfoParse(VscModeControlType *pVscMode)
 			/// Queue is full, do shift
 			GlobalVar.iVscAtrQueueHead =  (GlobalVar.iVscAtrQueueHead + 1) % VSC_ATR_QUEUE_CNT;
 		}
-		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrQueue[GlobalVar.iVscAtrQueueTail], (JBYTE *)pAtrRead, 4);	
+		UtilMemcpy((JBYTE *)&GlobalVar.vscAtrQueue[GlobalVar.iVscAtrQueueTail], (JBYTE *)pAtrRead, sizeof(JAtrType));	
 		GlobalVar.iVscAtrQueueTail = (GlobalVar.iVscAtrQueueTail + 1) % VSC_ATR_QUEUE_CNT;
 
 		//JAtrAddEx(pAtrQueue, pAtrRead);				
@@ -629,7 +629,7 @@ void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData)
 	VscModeEcgDataParse(pVscMode);
 	
 	//sprintf(msg, "\t\t [VSC]  ID = %03d, SIZE=%d, IDX = %d\r\n", pItem->wId , pItem->wLen, idx);
-	//DBG_PRINTF(msg);		
+	//DBG_PRINTF(msg);
 }
 
 void VscModeInit(char *pBaseFolder)	
