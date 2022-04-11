@@ -40,10 +40,10 @@ extern JINT CmdMBleConnectStatus(JBOOL *pbStatus);
 ///--------------------------------------------------------------------------------///
 ///		SBLE --> packet send to slave, shall be connected first
 ///--------------------------------------------------------------------------------///
-extern JINT CmdSBleSysVersionGet(void);
+extern JINT CmdSBleSysVersionGet(char *pModelName, JINT *piVersion);;
 extern JINT CmdSBleSysTimeSet(void);
 
-extern JINT CmdSBleSysSsnGet(void);
+extern JINT CmdSBleSysSsnGet(char *pStrSsn);
 extern JINT CmdSBleSysSsnSet(char *pSSN);
 
 extern JINT CmdSBleVscModeStart(void);

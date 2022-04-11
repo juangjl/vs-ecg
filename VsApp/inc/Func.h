@@ -27,7 +27,8 @@ extern JBOOL FuncMBleOpenCheck(JINT iSec);
 
 extern JBOOL FuncMBleClose(void);
 
-extern JBOOL FuncSBleVersionGet(void);
+extern JBOOL FuncSBleSysVersionGet(void);
+extern JBOOL FuncSBleSysSsnGet(void);
 
 /// VSC MODE
 extern JBOOL FuncVscModeInit(void);

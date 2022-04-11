@@ -281,18 +281,15 @@ JINT CmdMBleState(JINT *piState)
 }
 
 
-JINT CmdSBleSysVersionGet(void)
+JINT CmdSBleSysVersionGet(char *pModelName, JINT *piVersion)
 {
   JINT iErrNo = NO_ERR;
 
   PacketType    PacketOut;
   PacketAckType PacketIn;
   
-  JINT 	iTimeout = CMD_TIMEOUT_500MS;
-  JINT  iDeviceVersion;
-  char 	strDeviceName[256];  
+  JINT 	iTimeout = 3500;
   char 	msg[256];
-  JINT iRetry = 0;
 
   PacketInit(&PacketOut);
   
@@ -303,40 +300,23 @@ JINT CmdSBleSysVersionGet(void)
   PacketOut.wMOSILen 	= 0;
   PacketOut.wMISOLen 	= 32;
   
-  while(1)
-  {
-    /// slave packet Cmd
-    iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
+  /// slave packet Cmd
+	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
 
-    if(PacketIn.bAck != 'A')
-    {      
-      printf("\t [ERROR] Version  NACK, retry = %d, iErrNo = %d\r\n", iRetry, iErrNo);
-      iErrNo = ERR_WRONG_ARG_FORMAT;
-      iRetry = iRetry + 1;
-      UtilMsSleep(30);
-    }
-    else
-    {
-      break;
-    }
-    if(iRetry == 3)
-    {      
-      sprintf(msg, "%s", "[ERROR] Version get command failed\r\n");
-      DBG_PRINTF(msg);
-      return iErrNo;
-    }
+	if(PacketIn.bAck != 'A')
+  {
+    sprintf(msg, "[ERROR] Version  NACK\r\n");
+    DBG_PRINTF(msg);
+    iErrNo = ERR_WRONG_ARG_FORMAT;
   }
 
  	///-----------------------------------///
   /// COPY DATA
   ///-----------------------------------///		
-  UtilMemcpy((JBYTE *)&iDeviceVersion,   (JBYTE *)&PacketIn.bData[0], sizeof(JINT));
-  UtilMemcpy((JBYTE *)&strDeviceName[0], (JBYTE *)&PacketIn.bData[4], 28);
-  strDeviceName[28] = 0;
-
- 	sprintf(msg, "\t Model Name = %s, version = %d\r\n", strDeviceName, iDeviceVersion);
-  DBG_PRINTF(msg);
-  
+  UtilMemcpy((JBYTE *)piVersion,       (JBYTE *)&PacketIn.bData[0], sizeof(JINT));
+  UtilMemcpy((JBYTE *)&pModelName[0], (JBYTE *)&PacketIn.bData[4], 28);
+  pModelName[28] = 0;
+ 
   return iErrNo;
 }
 
@@ -432,7 +412,7 @@ JINT CmdSBleSysSsnSet(char *pSSN)
   return iErrNo;
 }
 
-JINT CmdSBleSysSsnGet(void)
+JINT CmdSBleSysSsnGet(char *pStrSsn)
 {
   JINT iErrNo = NO_ERR;
 

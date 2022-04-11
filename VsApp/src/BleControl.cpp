@@ -131,7 +131,8 @@ void BleControlCheck(void)
 			UtilMemset((JBYTE *)&strSSN[0], 0x00, SSN_SIZE);
 			ConfigStrGet((char *)CONFIG_ITEM_SSN, strSSN);
 			CmdSBleSysSsnSet(strSSN);
-			CmdSBleSysSsnGet();
+			FuncSBleSysSsnGet();
+			FuncSBleSysVersionGet();
 			GlobalVar.dwSysCtl6 &= ~SYS_CTL6_BLE_MASTER_SSN_SET;
 		}
 	}	

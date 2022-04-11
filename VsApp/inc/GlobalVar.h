@@ -213,7 +213,9 @@ typedef struct GlobalVarSt
   /// System Information
   ///=========================================///
   JWORD         wStatus;
-  JWORD         wVersion;   
+  
+  JINT          iBleVersion;    
+  char          strBleModelName[256];    
   
   JINT          iOSType;
   

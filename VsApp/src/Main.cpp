@@ -85,7 +85,7 @@ void MainInit(void)
 	printf("\r\n");
 	printf("\r\n");	
 	printf("--------------------------------------------------------------\r\n");
-	printf(" VS-APP (V1.0) programmed by JL JUANG 										    \r\n");
+	printf(" VS-APP programmed by JL JUANG 										    \r\n");
 	printf("--------------------------------------------------------------\r\n");
 	printf("\r\n");
 	

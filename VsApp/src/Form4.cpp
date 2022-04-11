@@ -110,7 +110,7 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 		fAtrTimeSecPre = 0;
 	}
 
-#if 1
+#if 0
 	if(pAtrFind->iCnt > 0)
 	{
 		sprintf(msg, "\t [ATR] ATR total = %d,  find_cnt = %d, sec0 = %0.3f, sec1=%0.3f\r\n", pAtrCtl->iAtrDataCnt, pAtrFind->iCnt, pAtrFind->fTimeSec0, pAtrFind->fTimeSec1);

@@ -59,7 +59,8 @@ void BleState(void)
 			{
 				GlobalVar.iBleOpenSec  = 0;
 				CmdSBleSysTimeSet();
-				iRet = CmdSBleSysSsnGet();
+				iRet = FuncSBleSysSsnGet();								
+				iRet = FuncSBleSysVersionGet();			
 				GlobalVar.iBleState = BLE_STATE_CONNECT_INIT;
 			}
 		}
@@ -78,7 +79,7 @@ void BleState(void)
 				FuncBleOpenCheck();
 				if(GlobalVar.bBleConnected == TRUE)
 				{
-					iRet = CmdSBleSysVersionGet();
+					iRet = FuncSBleSysVersionGet();
 				}
 			}
 		}

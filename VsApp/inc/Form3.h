@@ -47,7 +47,7 @@
 #define FORM3_FRAME4_LEFT								(640)
 #define FORM3_FRAME4_TOP								(500)
 #define FORM3_FRAME4_WIDTH							(400)
-#define FORM3_FRAME4_HEIGHT							(120)
+#define FORM3_FRAME4_HEIGHT							(180)
 #define FORM3_FRAME4_XGAP								(20)
 #define FORM3_FRAME4_YGAP								(20)
 #define FORM3_FRAME4_ROW								(30 + FORM3_FRAME4_YGAP)
@@ -75,7 +75,10 @@ typedef struct ViewDataForm3St
 	GtkWidget * pLabelBleScanOn;
 	
 	GtkWidget * pLabelBleDeviceName;	
-	GtkWidget * pLabelBleDeviceMac;		
+	GtkWidget * pLabelBleDeviceMac;
+			
+	GtkWidget * pLabelBleModelName;	
+	GtkWidget * pLabelBleVersion;	
 
 	GtkWidget * pLabelBleStatus;
 	

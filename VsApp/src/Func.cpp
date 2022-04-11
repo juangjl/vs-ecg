@@ -265,64 +265,70 @@ JBOOL FuncMBleClose(void)
 	return TRUE;
 }
 
-JBOOL FuncSBleVersionGet(void)
+JBOOL FuncSBleSysVersionGet(void)
 {
 	JINT iErrNo = NO_ERR;
 	JINT i = 0;
 	JINT iCnt = 1;
 	char msg[256];
 
+	JINT iBleVersion;
+  char strBleDeviceName[256];
+
 	if(GlobalVar.bBleConnected == FALSE)
 	{
 		return FALSE;
 	}
-	
-	UtilMsSleep(200);
 
 	///----------------------------------------------------------///
 	/// Read version
 	///----------------------------------------------------------///
-	iErrNo = CmdSBleSysVersionGet();
+	iErrNo = CmdSBleSysVersionGet((char *)&strBleDeviceName[0], &iBleVersion);
 	if(iErrNo != NO_ERR)
 	{			
 		sprintf(msg, "[ERROR] Version Read Failed\r\n");
 		DBG_PRINTF(msg);		
 		return  FALSE;
 	}
-	
-	///----------------------------------------------------------///
-	/// Read Social Security Numbers (SSN)
-	///----------------------------------------------------------///
-	iErrNo = CmdSBleSysSsnGet();
-	if(iErrNo != NO_ERR)
-	{			
-		sprintf(msg, "[ERROR] SSN Read Failed\r\n");
-		DBG_PRINTF(msg);		
-		return  FALSE;
-	}	
 
+	GlobalVar.iBleVersion = iBleVersion;
+	strcpy((char *)&GlobalVar.strBleModelName[0], (char *)&strBleDeviceName[0]);
+
+	sprintf(msg, "\t\t Model Name    = %s\r\n", GlobalVar.strBleModelName);
+	DBG_PRINTF(msg);
+	sprintf(msg, "\t\t Model Version = %d\r\n", GlobalVar.iBleVersion);
+	DBG_PRINTF(msg);
+		
 	return TRUE;
 }
 
-JBOOL FuncSBleSSNGet(void)
+JBOOL FuncSBleSysSsnGet(void)
 {
 	JINT iErrNo = NO_ERR;
 	JINT i = 0;
 	JINT iCnt = 1;
+	char msg[256];
+
+  char strSsn[256];
 
 	if(GlobalVar.bBleConnected == FALSE)
 	{
 		return FALSE;
 	}
 	
-	UtilMsSleep(20);
-
-	for(i = 0 ; i < iCnt; i = i + 1)
-	{
-		iErrNo = CmdSBleSysSsnGet();
-		sleep(1);
+	///----------------------------------------------------------///
+	/// Read version
+	///----------------------------------------------------------///
+	iErrNo = CmdSBleSysSsnGet((char *)&strSsn[0]);
+	if(iErrNo != NO_ERR)
+	{			
+		sprintf(msg, "[ERROR] SSN GetFailed\r\n");
+		DBG_PRINTF(msg);		
+		return  FALSE;
 	}
 
+	strcpy((char *)&GlobalVar.strSSN[0], (char *)&strSsn[0]);
+		
 	return TRUE;
 }
 

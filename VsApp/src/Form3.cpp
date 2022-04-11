@@ -85,6 +85,35 @@ gint CallbackForm3Timer1 (gpointer data)
 	JINT iRSSI 	= 0;
 	char str[256];
 
+	char strBleVersion[256];
+	
+	///------------------------------------------------------------------------------------///
+	///	BLE Model and Version
+	///------------------------------------------------------------------------------------///
+
+	if(GlobalVar.iBleState == BLE_STATE_CLOSE)
+	{		
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleModelName), "--");
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleVersion),   "--");
+	}
+	if(GlobalVar.iBleState == BLE_STATE_WAIT)
+	{
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleModelName), "--");
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleVersion),   "--");
+	}
+	if(GlobalVar.iBleState == BLE_STATE_CONNECTED)
+	{
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleModelName), GlobalVar.strBleModelName);
+		sprintf(strBleVersion, "%d", GlobalVar.iBleVersion);
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleVersion),   strBleVersion);
+	}
+	if(GlobalVar.iBleState == BLE_STATE_VSC_MODE)
+	{
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleModelName), GlobalVar.strBleModelName);
+		sprintf(strBleVersion, "%d", GlobalVar.iBleVersion);
+		gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBleVersion),   strBleVersion);
+	}	
+
 	///------------------------------------------------------------------------------------///
 	///	BLE Status
 	///------------------------------------------------------------------------------------///
@@ -576,6 +605,64 @@ static JINT LabelInit(void)
 	pViewDataPtr->pLabelBleDeviceMac = pLabel;
 
   ///-----------------------------------------------------------------------///
+	/// Label: Model Name
+	///-----------------------------------------------------------------------///
+	x0 = FORM3_FRAME4_LEFT + FORM3_FRAME4_XGAP;
+	y0 = FORM3_FRAME4_TOP  + FORM3_FRAME4_ROW;  
+	w 	= 120;
+	h 	= 30;	
+		
+	pLabel = gtk_label_new_with_mnemonic("Model Name:");
+  gtk_widget_set_name(pLabel, "");  
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
+	gtk_widget_set_size_request(pLabel, w, h);  
+  gtk_widget_show(pLabel);
+
+	///-----------------------------------------------------------------------///
+	/// Label: BLE_MODEL_NAME
+	///-----------------------------------------------------------------------///	
+	x0 = FORM3_FRAME4_LEFT + FORM3_FRAME4_XGAP + 150;
+	y0 = FORM3_FRAME4_TOP  + FORM3_FRAME4_ROW;  
+	w 	= 200;
+	h 	= 30;	
+		
+	pLabel = gtk_label_new_with_mnemonic("--");
+  gtk_widget_set_name(pLabel, "form3_label_ble_device_name");  
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
+	gtk_widget_set_size_request(pLabel, w, h);  
+  gtk_widget_show(pLabel);
+ 	pViewDataPtr->pLabelBleModelName = pLabel;
+
+	///-----------------------------------------------------------------------///
+	/// Label: Version
+	///-----------------------------------------------------------------------///
+	x0 = FORM3_FRAME4_LEFT + FORM3_FRAME4_XGAP;
+	y0 = FORM3_FRAME4_TOP  + FORM3_FRAME4_ROW * 2;
+	w 	= 120;
+	h 	= 30;	
+		
+	pLabel = gtk_label_new_with_mnemonic("Version:");
+  gtk_widget_set_name(pLabel, "");  
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
+	gtk_widget_set_size_request(pLabel, w, h);  
+  gtk_widget_show(pLabel);
+
+	///-----------------------------------------------------------------------///
+	/// Label: BLE_VERSION
+	///-----------------------------------------------------------------------///	
+	x0 = FORM3_FRAME4_LEFT + FORM3_FRAME4_XGAP + 150;
+	y0 = FORM3_FRAME4_TOP  + FORM3_FRAME4_ROW * 2;  
+	w 	= 200;
+	h 	= 30;	
+		
+	pLabel = gtk_label_new_with_mnemonic("--");
+  gtk_widget_set_name(pLabel, "form3_label_ble_device_name");  
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pLabel, x0, y0);
+	gtk_widget_set_size_request(pLabel, w, h);  
+  gtk_widget_show(pLabel);
+ 	pViewDataPtr->pLabelBleVersion = pLabel;	 	
+
+  ///-----------------------------------------------------------------------///
 	/// Label: Ble Status
 	///-----------------------------------------------------------------------///	  
 	x0 	= FORM3_FRAME4_LEFT;
@@ -763,6 +850,21 @@ static JINT FrameInit(void)
   h  = FORM3_FRAME2_HEIGHT;
 
   pFrame = gtk_frame_new ("BLE Measurement");
+  gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
+  gtk_frame_set_label_align (GTK_FRAME (pFrame), 0, 0.5);
+  gtk_widget_set_size_request(pFrame, w, h); 
+  gtk_fixed_put(GTK_FIXED(pViewDataPtr->pView), pFrame, x0, y0);
+  gtk_widget_show(pFrame);
+
+	///-----------------------------------------------------------------------///
+	/// Frame4: Device Status
+	///-----------------------------------------------------------------------///
+	x0 = FORM3_FRAME4_LEFT;
+	y0 = FORM3_FRAME4_TOP;
+  w  = FORM3_FRAME4_WIDTH;
+  h  = FORM3_FRAME4_HEIGHT;
+
+  pFrame = gtk_frame_new ("Device Status");
   gtk_frame_set_shadow_type (GTK_FRAME (pFrame), GTK_SHADOW_ETCHED_IN);
   gtk_frame_set_label_align (GTK_FRAME (pFrame), 0, 0.5);
   gtk_widget_set_size_request(pFrame, w, h); 
