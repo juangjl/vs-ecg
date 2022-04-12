@@ -48,6 +48,7 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 	char strEnd[64];
 
 	GtkStyleContext *pContext;	
+	static JBOOL bDrawing = FALSE;
 
 	///-------------------------------------------------------------------///
 	/// ATR Variable : Start
@@ -72,6 +73,14 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 	///-------------------------------------------------------------------///
 	/// ATR Variable : End
 	///-------------------------------------------------------------------///
+
+	/// Drawing check
+	if(bDrawing == TRUE)
+	{
+		return;
+	}
+	bDrawing = TRUE;
+
 	if((iTimeMS < 0))
 	{
 		iTimeMS = 0;
@@ -147,6 +156,8 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 	///-------------------------------------------------------------------///	
 	
 	delete(pDC);
+
+	bDrawing = FALSE;
 	
 	return  TRUE;
 }	
