@@ -77,7 +77,7 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 	/// Drawing check
 	if(bDrawing == TRUE)
 	{
-		return;
+		return FALSE;
 	}
 	bDrawing = TRUE;
 
