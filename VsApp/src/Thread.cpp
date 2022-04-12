@@ -8,7 +8,7 @@
  * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  */
 #include "Global.h"
-
+#define VSC_MODE_ERROR_COUNT_MAX			(5)
 void * ThreadVscMode(void *arg)
 {		
 	char msg[256];
@@ -29,6 +29,8 @@ void * ThreadVscMode(void *arg)
 
 	JFLOAT 	fTimeTotalCount  = 0;
 	JFLOAT 	fTimeSumMS   		 = 0;
+
+	JINT 		iErrCnt = 0;
 	
 	while(1)
 	{
@@ -49,9 +51,9 @@ void * ThreadVscMode(void *arg)
 			continue;
 		}
 
-		iTimeStart = UtilMsGet();		
-		iErrNo = CmdSBleVscModeRead();
-		iTimeEnd = UtilMsGet();
+		iTimeStart 	= UtilMsGet();		
+		iErrNo 			= CmdSBleVscModeRead();
+		iTimeEnd 		= UtilMsGet();
 
 		// sprintf(msg, "[VSC]READ: END  , MS0 = %ld, MS1 = %ld -->%d\r\n", iMS0, iMS1, (JINT)(iTimeEnd - iTimeStart));
 		// DBG_PRINTF(msg);
@@ -76,10 +78,30 @@ void * ThreadVscMode(void *arg)
 
 		iTimeTotalMS = (iTimeEnd - iTimeStart);
 
+		///---------------------------------------------------------------------------------------///
+		/// Timeout check
+		///---------------------------------------------------------------------------------------///
 		if(iTimeTotalMS > 200)
 		{
 			sprintf(msg, "[VSC] TOTAL_TIME > 200 = %d\r\n" , iTimeTotalMS);
 			DBG_PRINTF(msg);
+			iErrCnt = iErrCnt + 1;
+			if(iErrCnt > VSC_MODE_ERROR_COUNT_MAX)
+			{
+				break;
+			}
+		}
+		else
+		{
+			iErrCnt = 0;
+		}
+
+		///---------------------------------------------------------------------------------------///
+		/// State check
+		///---------------------------------------------------------------------------------------///
+		if(GlobalVar.iBleState != BLE_STATE_VSC_MODE)
+		{
+			break;
 		}
 
 		///---------------------------------------------------------------------------------------///

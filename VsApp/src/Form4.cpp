@@ -157,6 +157,8 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 	
 	delete(pDC);
 
+	UtilMsSleep(20);
+
 	bDrawing = FALSE;
 	
 	return  TRUE;
