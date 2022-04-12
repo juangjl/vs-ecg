@@ -445,10 +445,10 @@ JINT CmdSBleSysSsnGet(char *pStrSsn)
  	///-----------------------------------///
   /// COPY DATA
   ///-----------------------------------///		
-  UtilMemcpy((JBYTE *)&GlobalVar.strSSN[0], (JBYTE *)&PacketIn.bData[0], 32);
+  UtilMemcpy((JBYTE *)&pStrSsn[0], (JBYTE *)&PacketIn.bData[0], 32);
 
 
- 	sprintf(msg, "\t[CMD][BLE] GET SSN='%s'\r\n", (char *)&GlobalVar.strSSN[0]);
+ 	sprintf(msg, "\t[CMD][BLE] GET SSN='%s'\r\n", (char *)&pStrSsn[0]);
   DBG_PRINTF(msg);
   
   return iErrNo;
