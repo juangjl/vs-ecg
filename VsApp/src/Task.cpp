@@ -204,6 +204,11 @@ void SubBleVscMode(void)
 	JFLOAT 	fGSenY[VSC_MODE_GSENSOR_DATA_COUNT];
 	JFLOAT 	fGSenZ[VSC_MODE_GSENSOR_DATA_COUNT];
 
+	JINT 		iSegId      = 0;
+	JINT 		iSegTimeMS  = 0;
+	JFLOAT 	fSegTimeSec = 0;
+	char  	strTimeSec[256];
+
 	if(GlobalVar.bVscModeAdded == FALSE)
 	{
 		return;
@@ -212,11 +217,11 @@ void SubBleVscMode(void)
 	GlobalVar.bVscModeAdded = FALSE;
 	while(1)
 	{
-		if(GlobalVar.iVscModeArrIdxRead == GlobalVar.iVscModeArrIdx)
+		if(GlobalVar.iVscModeQueueHead == GlobalVar.iVscModeQueueTail)
 		{
 			break;
 		}
-		pVscMode = &GlobalVar.vscModeArr[GlobalVar.iVscModeArrIdxRead];
+		pVscMode = &GlobalVar.vscModeQueue[GlobalVar.iVscModeQueueHead];
 		
 		///------------------------------------------------------------------------------------------///
 		///  Save VscMode Data
@@ -249,7 +254,27 @@ void SubBleVscMode(void)
 		*pDSTimeMS0 = *pDSTimeMS0 + 200;
 		*pDSTimeMS1 = *pDSTimeMS1 + 200;
 
-		GlobalVar.iVscModeArrIdxRead = (GlobalVar.iVscModeArrIdxRead + 1) % VSC_MODE_ARR_LEN;
+		///------------------------------------------------------------------------------------------///
+		///  Segment time
+		///------------------------------------------------------------------------------------------///
+		iSegTimeMS = *pDSTimeMS0;		
+		if((iSegTimeMS % 4000) == 0)
+		{						
+			iSegId 			= (JINT)((iSegTimeMS / 4000) - 1);
+			fSegTimeSec = (JFLOAT)(iSegId * 4);
+			UtilTimeStringGet(fSegTimeSec, strTimeSec);
+			sprintf(msg, "\t -------- SEC[%d][%d][%s] -------- VSM-TIME = %04d/%02d/%02d-%02d:%02d:%02d \r\n", 
+													iSegId, iSegTimeMS, strTimeSec,													
+													pVscMode->jtm.iYear,
+													pVscMode->jtm.iMonth,
+													pVscMode->jtm.iDay,
+													pVscMode->jtm.iHour,
+													pVscMode->jtm.iMin,
+													pVscMode->jtm.iSec); 
+			DBG_PRINTF(msg);
+		}
+
+		GlobalVar.iVscModeQueueHead = (GlobalVar.iVscModeQueueHead + 1) % VSC_MODE_ARR_LEN;
 	}
 }
 
@@ -287,7 +312,7 @@ void SubBleVscAtr(void)
     
 		JAtrDataGet(&GlobalVar.vscAtrNow, &A, &fTimeSec);
 
-    AtrCtlVscModeAdd(pAtrCtl, A, fTimeSec);
+    AtrCtlAddEx(pAtrCtl, A, fTimeSec);
 
     /// check the atr data save  
 		if(GlobalVar.bVscModeSave == TRUE)

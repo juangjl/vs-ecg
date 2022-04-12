@@ -46,7 +46,7 @@ extern JBOOL AtrAbbrevGet(JDWORD dwA, char * pAbbrev, JDWORD *pdwColor);
 
 extern JBOOL AtrCtlFind(AtrCtlType *pAtrCtl, AtrFindType *pAtrFind);
 extern JBOOL AtrCtlAdd(AtrCtlType  *pAtrCtl, JDWORD A, JFLOAT fTimeSec);
-extern JBOOL AtrCtlVscModeAdd(AtrCtlType *pAtrCtl, JDWORD dwA, JFLOAT fTimeSec);
+extern JBOOL AtrCtlAddEx(AtrCtlType *pAtrCtl, JDWORD dwA, JFLOAT fTimeSec);
 extern JBOOL AtrCtlInit(AtrCtlType *pAtrCtl);
 
 #endif ///<  __ATR_DATA_CTL_H__

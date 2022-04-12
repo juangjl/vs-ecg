@@ -162,8 +162,8 @@ void JAtrDataPrint(JAtrType *pAtr)
   fTimeSec = (JFLOAT)pAtr->dwMS / 1000;
   UtilTimeStringGet(fTimeSec, strTime);
 
-  //sprintf(msg, "\t [ATR][DATA] %-10s (%d) - %s\r\n", JAtrLabel[pAtr->bAtr], pAtr->bAtr, strTime);
-  //DBG_PRINTF(msg);
+  sprintf(msg, "\t\t [ATR][DATA] %-10s (%02d) - %s\r\n", JAtrLabel[pAtr->bAtr], pAtr->bAtr, strTime);
+  DBG_PRINTF(msg);
 }
 
 void JAtrDataClean(JAtrType *pAtr)
@@ -174,7 +174,7 @@ void JAtrDataClean(JAtrType *pAtr)
 
 JINT JAtrSizeGet(JAtrQueueType * pAtrQueue)
 {
-   return pAtrQueue->iAtrCnt;
+  return pAtrQueue->iAtrCnt;
 }
 
 JBOOL JAtrFullCheck(JAtrQueueType * pAtrQueue)

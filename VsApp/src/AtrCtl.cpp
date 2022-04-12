@@ -231,19 +231,19 @@ JBOOL AtrCtlFind(AtrCtlType *pAtrCtl, AtrFindType *pAtrFind)
   return TRUE;
 }
       
-JBOOL AtrCtlVscModeAdd(AtrCtlType *pAtrCtl, JDWORD dwA, JFLOAT fTimeSec)
+JBOOL AtrCtlAddEx(AtrCtlType *pAtrCtl, JDWORD dwA, JFLOAT fTimeSec)
 {
   JINT idx = pAtrCtl->iAtrDataCnt;
   AtrDataType *pAtrData = NULL;
   AtrDataType *pAtrData2 = NULL;
-  JINT i = 0;
+  JINT i    = 0;
   JINT cnt  = 0;
   
   if(pAtrCtl->iAtrDataCnt < ATR_DATA_CNT)
   {
     pAtrData =  &pAtrCtl->atrData[idx];
-    pAtrData->dwA      = dwA;
-    pAtrData->fTimeSec = fTimeSec;
+    pAtrData->dwA        = dwA;
+    pAtrData->fTimeSec   = fTimeSec;
     pAtrCtl->iAtrDataCnt = pAtrCtl->iAtrDataCnt  + 1; 
   }
   else
@@ -265,8 +265,7 @@ JBOOL AtrCtlVscModeAdd(AtrCtlType *pAtrCtl, JDWORD dwA, JFLOAT fTimeSec)
     pAtrData->dwA      = dwA;
     pAtrData->fTimeSec = fTimeSec;
     i = i + 1;
-    pAtrCtl->iAtrDataCnt = i; 
-    
+    pAtrCtl->iAtrDataCnt = i;     
   }
   return TRUE;
 }

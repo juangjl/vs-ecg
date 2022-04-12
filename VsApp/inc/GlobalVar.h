@@ -306,9 +306,9 @@ typedef struct GlobalVarSt
   /// VSC Mode
   ///=========================================///  
   JBOOL         bVscModeAdded;
-  JINT          iVscModeArrIdxRead;
-  JINT          iVscModeArrIdx;  
-  VscModeControlType vscModeArr[VSC_MODE_ARR_LEN];
+  JINT          iVscModeQueueHead;
+  JINT          iVscModeQueueTail;  
+  VscModeControlType vscModeQueue[VSC_MODE_ARR_LEN];
 
   JBOOL         bVscModeReadOn;
   long          iVscModeMSPre;

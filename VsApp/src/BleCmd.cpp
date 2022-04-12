@@ -566,10 +566,10 @@ JINT CmdSBleVscModeRead(void)
 	VscModeDecode(wId, wLen, (JBYTE *)&PacketIn.bData[0]);
   
   /// copy to main
-  pVscMode = &GlobalVar.vscModeArr[GlobalVar.iVscModeArrIdx];
+  pVscMode = &GlobalVar.vscModeQueue[GlobalVar.iVscModeQueueTail];
   UtilMemcpy((JBYTE *)pVscMode, (JBYTE *)&VscModeCtl, sizeof(VscModeControlType));
 
-  GlobalVar.iVscModeArrIdx = (GlobalVar.iVscModeArrIdx + 1) % VSC_MODE_ARR_LEN;
+  GlobalVar.iVscModeQueueTail = (GlobalVar.iVscModeQueueTail + 1) % VSC_MODE_ARR_LEN;
   GlobalVar.bVscModeAdded = TRUE;
 	
 	VscModeCtl.wId = (VscModeCtl.wId + 1) % VSC_MODE_IDX_MAX;		

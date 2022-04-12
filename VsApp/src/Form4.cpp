@@ -68,10 +68,10 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 	static JFLOAT fAtrTimeSecPre = -1;
 
 	JFLOAT fTimeSec = -1;
+
 	///-------------------------------------------------------------------///
 	/// ATR Variable : End
 	///-------------------------------------------------------------------///
-
 	if((iTimeMS < 0))
 	{
 		iTimeMS = 0;
@@ -93,9 +93,11 @@ gboolean CallbackForm4DrawArea0(GtkWidget *widget, cairo_t *cr, gpointer data)
 	/// draw X label
 	UtilTimeStrGet(iTimeMS, strStart);
 	UtilTimeStrGet(iTimeMS + 3000, strCenter);	
-	UtilTimeStrGet(iTimeMS + 6000, strEnd);		
+	UtilTimeStrGet(iTimeMS + 6000, strEnd);	
+	
+	JChartLabelXDrawEx(pChart, strStart, strCenter, strEnd);	
 
-///-------------------------------------------------------------------///
+  ///-------------------------------------------------------------------///
 	/// ATR-DRAW : START
 	///-------------------------------------------------------------------///		
 	fAtrTimeSec = (JFLOAT)(iTimeMS) / 1000;
@@ -262,7 +264,6 @@ void Form4LabelInfoUpdate(void)
 	sprintf(strValue, "%0.0f", pVscMode->fBattTotalSec);
 	gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelBattSec), strValue);
 
-
 	///-----------------------------------------------------------------//
 	/// 10.  fHrvSDNN
 	/// 11.  fHrvNN50
@@ -316,7 +317,6 @@ void Form4LabelInfoUpdate(void)
 	
 	return;
 }
-
 
 ///------------------------------------------------------------------------------------///
 /// Form4 Function
