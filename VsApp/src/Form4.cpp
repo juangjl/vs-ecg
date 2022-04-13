@@ -191,11 +191,17 @@ static JINT Form4Chart0Init()
 
 JINT CallbackForm4Timer1 (gpointer data)
 {    
-	Form4LabelInfoUpdate();	
+	ViewDataForm4Type * pViewDataPtr = (ViewDataForm4Type * ) pThis->pViewData;
+	
+	if(pViewDataPtr->bShow == TRUE)
+	{
+		Form4LabelInfoUpdate();	
+	}
+
 	return TRUE;
 }
 
-JINT CallbackForm4Timer2 (gpointer data)
+JINT CallbackForm4Timer2(gpointer data)
 {
 	ViewDataForm4Type * pViewDataPtr = (ViewDataForm4Type * ) pThis->pViewData;
 

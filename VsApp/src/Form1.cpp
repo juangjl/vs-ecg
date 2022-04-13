@@ -316,7 +316,10 @@ gint CallbackForm1Timer2 (gpointer data)
 
 	if(GlobalVar.iVscInfoCnt > 0)
 	{
-		Form1LabelInfoUpdate();
+		if(pViewDataPtr->bShow == TRUE)
+		{
+			Form1LabelInfoUpdate();
+		}
 	}
 
 	if(GlobalVar.bChartEcgRun == FALSE)
