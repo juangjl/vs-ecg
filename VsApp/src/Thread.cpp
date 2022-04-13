@@ -8,7 +8,7 @@
  * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  */
 #include "Global.h"
-#define VSC_MODE_ERROR_COUNT_MAX			(50)
+#define VSC_MODE_ERROR_COUNT_MAX			(100)
 void * ThreadVscMode(void *arg)
 {		
 	char msg[256];

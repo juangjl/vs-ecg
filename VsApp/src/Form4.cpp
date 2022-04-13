@@ -326,10 +326,10 @@ void Form4LabelInfoUpdate(void)
 	sprintf(strValue, "%0.0f", pVscMode->fHrvTP);
 	gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelHrvTP), strValue);
 
-  sprintf(strValue, "%0.0f", pVscMode->fHrvLFTP);
+  sprintf(strValue, "%0.3f", pVscMode->fHrvLFTP);
 	gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelHrvLFTP), strValue);
 
-  sprintf(strValue, "%0.0f", pVscMode->fHrvHFTP);
+  sprintf(strValue, "%0.3f", pVscMode->fHrvHFTP);
 	gtk_label_set_text(GTK_LABEL(pViewDataPtr->pLabelHrvHFTP), strValue);
 	
 	return;
