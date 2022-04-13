@@ -413,23 +413,24 @@ gboolean CallbackForm1DrawArea0 (GtkWidget *widget, cairo_t *cr, gpointer data)
 	
 	JFLOAT fTimeSec = -1;
 
+	static JBOOL bDrawing = FALSE;
+
+	if(bDrawing == TRUE)
+	{
+		return FALSE;
+	}
+	bDrawing = TRUE;
+
 	if(GlobalVar.bChartEcgRun == FALSE)
 	{
 		iTimeMSPre = -1;
 		fTimeSec   = -1;
 	}	
 				
-	if(GlobalVar.bChartLoadEcgDS0Draw == TRUE)
-	{
-		return FALSE;
-	}
-
 	iWidth  = gtk_widget_get_allocated_width(widget);
 	iHeight = gtk_widget_get_allocated_height(widget);
 	
 	pDC  = new JDraw(cr); 
-	
-	GlobalVar.bChartLoadEcgDS0Draw  = TRUE;
 	
 	iTimeMS = GlobalVar.iFileTimeMSNow;
 	if(iTimeMSPre != iTimeMS)
@@ -458,7 +459,8 @@ gboolean CallbackForm1DrawArea0 (GtkWidget *widget, cairo_t *cr, gpointer data)
 
 	delete(pDC);
 
-	GlobalVar.bChartLoadEcgDS0Draw = FALSE;
+	UtilMsSleep(20);
+	bDrawing = FALSE;
 
 	return  TRUE;
 }	

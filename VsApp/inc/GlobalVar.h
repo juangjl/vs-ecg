@@ -359,8 +359,7 @@ typedef struct GlobalVarSt
   ///=========================================///
   JBOOL         bChartEcgRun;
   JBOOL         bChartEcgReverse;
-  JBOOL         bChartLoadEcgDS0Draw;
-  
+    
   ///=========================================///
   /// Ecg Data load
   ///=========================================///
