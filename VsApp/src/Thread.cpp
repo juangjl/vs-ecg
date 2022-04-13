@@ -8,7 +8,7 @@
  * @note Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
  */
 #include "Global.h"
-#define VSC_MODE_ERROR_COUNT_MAX			(5)
+#define VSC_MODE_ERROR_COUNT_MAX			(50)
 void * ThreadVscMode(void *arg)
 {		
 	char msg[256];
@@ -30,7 +30,7 @@ void * ThreadVscMode(void *arg)
 	JFLOAT 	fTimeTotalCount  = 0;
 	JFLOAT 	fTimeSumMS   		 = 0;
 
-	JINT 		iErrCnt = 0;
+	JINT 		iTimeoutCnt = 0;
 	
 	while(1)
 	{
@@ -85,15 +85,15 @@ void * ThreadVscMode(void *arg)
 		{
 			sprintf(msg, "[VSC] TOTAL_TIME > 200 = %d\r\n" , iTimeTotalMS);
 			DBG_PRINTF(msg);
-			iErrCnt = iErrCnt + 1;
-			if(iErrCnt > VSC_MODE_ERROR_COUNT_MAX)
+			iTimeoutCnt = iTimeoutCnt + 1;
+			if(iTimeoutCnt > VSC_MODE_ERROR_COUNT_MAX)
 			{
 				break;
 			}
 		}
 		else
 		{
-			iErrCnt = 0;
+			iTimeoutCnt = 0;
 		}
 
 		///---------------------------------------------------------------------------------------///

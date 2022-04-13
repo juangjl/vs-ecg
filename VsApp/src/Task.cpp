@@ -38,9 +38,9 @@ void TaskSerialPort(void)
 		else
 		{
 			GlobalVar.dwSysSta5 &= ~SYS_STA5_SERIAL_PORT_OPEN;
-
+			GlobalVar.iBleState = BLE_STATE_CLOSE;
 			/// set serial port open failed
-			GlobalVar.dwSysCtl7 |= SYS_CTL7_MSG_SERIAL_PORT_OPEN_FAILED;
+			//GlobalVar.dwSysCtl7 |= SYS_CTL7_MSG_SERIAL_PORT_OPEN_FAILED;
 		}
 
 		GlobalVar.dwSysCtl5 &= ~SYS_CTL5_SERIAL_PORT_OPEN;
