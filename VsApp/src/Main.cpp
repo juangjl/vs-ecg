@@ -139,6 +139,10 @@ JINT main(int argc, char *argv[])
 		{
 			gtk_main_iteration();
 		}
+		else
+		{
+			UtilMsSleep(20);
+		}
 
 		if(GlobalVar.bAppExit == TRUE)
 		{

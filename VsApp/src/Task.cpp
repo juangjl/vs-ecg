@@ -171,7 +171,8 @@ void MainLoop()
 		if(GlobalVar.bAppExit == TRUE)
 		{
 			break;
-		}		
+		}	
+		UtilMsSleep(2);	
 	}
 	return;
 }

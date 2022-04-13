@@ -11,7 +11,7 @@
 #ifndef __APP_H__
 #define __APP_H__ 
 
-#define APP_TITLE										"VS-APP (V1.08) - VitalSigns Technology"
+#define APP_TITLE										"VS-APP (V1.09) - VitalSigns Technology"
 
 #define JVIEW_IDX_FORM1       			(0)
 #define JVIEW_IDX_FORM2       			(1)
