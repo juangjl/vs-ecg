@@ -109,6 +109,18 @@
 #define SYS_CTL7_MSG_VSC_MODE_READ_FAILED	  			(1<<1)
 
 ///---------------------------------------------------------------///
+/// SYS_CTL8: GATT
+///---------------------------------------------------------------///
+#define SYS_CTL8_JGATT_SCAN_START						      (1<<0)
+#define SYS_CTL8_JGATT_SCAN_STOP							    (1<<1)
+
+#define SYS_CTL8_JGATT_OPEN									      (1<<2)
+#define SYS_CTL8_JGATT_CLOSE									    (1<<3)
+
+#define SYS_CTL8_JGATT_VSC_MODE_START				      (1<<4)
+#define SYS_CTL8_JGATT_VSC_MODE_STOP					    (1<<5)
+
+///---------------------------------------------------------------///
 /// BLE_STATE
 ///---------------------------------------------------------------///
 #define BLE_STATE_CLOSE									(0)
@@ -228,6 +240,7 @@ typedef struct GlobalVarSt
   JDWORD        dwSysCtl5;   ///< SERIAL PORT CONTROL : UI to Task
   JDWORD        dwSysCtl6;   ///< BLE CONTROL : UI to Task 
   JDWORD        dwSysCtl7;   ///< Message Box
+  JDWORD        dwSysCtl8;   ///< Gatt control
 
   JDWORD        dwSysSta5;   ///< SERIAL PORT STATUS 
   JDWORD        dwSysSta6;   ///< BLE STATUS
@@ -383,6 +396,17 @@ typedef struct GlobalVarSt
   SRegType      SReg;
   JBOOL         bSRegOn;
   JBOOL         bSRegWrite;
+
+  ///=========================================///
+  /// GATT Process id
+  ///=========================================///  
+  pid_t         pid0;
+
+  ///=========================================///
+  /// shared memory
+  ///=========================================///  
+  JINT          iShmId;
+  key_t         iShmKey;  
 
  } GlobalVarType;
 

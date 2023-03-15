@@ -1,5 +1,4 @@
 #------------------------------------------------------------------------------#
-
 # File : Makefile 
 # Author: jl_juang@vsigntek.com
 # Copyright (c) 2021, VitalSigns Technology Co., Ltd., all rights reserved.
@@ -14,7 +13,6 @@ SRC=./src
 OUT=./out
 
 OS_NAME := $(shell uname -s)
-
 #-----------------------------#
 # OS TYPE
 # WINDOWS : 0
@@ -28,9 +26,12 @@ OS_TYPE_MAC_OS=2
 OS_TYPE=OS_TYPE_WINDOWS
 CFLAGS_OS=
 
-ifeq ($(OS_NAME), Linux)
-	CFLAGS_OS= -Wno-format-overflow  -Wno-conversion-null -Wno-pointer-arith
-	OS_TYPE=OS_TYPE_UBUNTU
+ifeq ($(OS_NAME), Linux)	
+	CFLAG_BLUETOOTH=$(shell pkg-config --cflags gio-2.0) 
+	LFLAG_BLUETOOTH=$(shell pkg-config --libs gio-2.0) -lbluetooth	
+	CFLAGS_OS= -Wno-format-overflow  -Wno-conversion-null -Wno-pointer-arith $(CFLAG_BLUETOOTH) -I./inc/lib -I./ 
+	LFLAGS_OS= $(LFLAG_BLUETOOTH)
+	OS_TYPE=OS_TYPE_UBUNTU	
 endif
 
 ifeq ($(OS_NAME), Darwin)
@@ -40,8 +41,13 @@ endif
 CFLAGS= -O3 -ansi -g -Wno-unused-result -DARCH=$(shell uname)    -DOS_TYPE=$(OS_TYPE) $(CFLAGS_OS)
 CFLAG_GTK= $(shell pkg-config --cflags  gtk+-3.0)
 
-LFLAGS= -lpthread -lz -lm
+#LFLAGS= -lpthread -lz -lm
+LFLAGS=   -lpthread -lz -lm $(LFLAGS_OS)
 LDLIB_GTK= $(shell pkg-config --libs gtk+-3.0) -w
+
+ifeq ($(OS_NAME), Darwin)
+        LFLAGS+=  ./res/app.res
+endif
 
 INC=  -I./inc 
 

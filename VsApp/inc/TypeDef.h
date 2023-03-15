@@ -39,6 +39,9 @@ typedef void                 JVOID;
 /// int
 typedef int              		 JINT;
 
+/// long
+typedef long                 JLONG;
+
 /// int
 typedef unsigned int      	 JUINT;
 

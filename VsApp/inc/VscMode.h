@@ -11,6 +11,9 @@
 #ifndef __VSC_MODE_H__
 #define __VSC_MODE_H__ 
 
+#define VSC_MODE_TYPE0															(0x00)
+#define VSC_MODE_TYPE1															(0x01)
+
 #define VSC_MODE_INFO_TYPE													(0)
 
 #define VSC_MODE_INFO_TYPE0_TIME_UTC								(1)
@@ -64,7 +67,7 @@ typedef struct VscModeItemType
 } VscModeItemType;
 
 #define 	VSC_MODE_CAHNNEL_COUNT							(2)
-#define 	VSC_MODE_CAHNNEL_DATA_COUNT					(100)	///< 200ms @ 500 hz =  100
+#define 	VSC_MODE_CHANNEL_DATA_COUNT					(100)	///< 200ms @ 500 hz =  100
 #define 	VSC_MODE_GSENSOR_DATA_COUNT					(5)		///< 200ms @ 25  hz =  5
 typedef struct VscModeControlSt
 {
@@ -83,7 +86,7 @@ typedef struct VscModeControlSt
 	char 		strFileNameInfo[512];
 	char 		strFileNameGSensor[512];
 	char 		strFileNameData[VSC_MODE_CAHNNEL_COUNT][512];
-	JFLOAT 	fValueCH[VSC_MODE_CAHNNEL_COUNT][VSC_MODE_CAHNNEL_DATA_COUNT];
+	JFLOAT 	fValueCH[VSC_MODE_CAHNNEL_COUNT][VSC_MODE_CHANNEL_DATA_COUNT];
 
 	VscModeItemType item;
 	
@@ -120,6 +123,8 @@ typedef struct VscModeControlSt
 
 	JAtrType atrNow;				///< 27 :	
 } VscModeControlType;
+
+#define VSC_MODE_QUEUE_SIZE             (60)
 
 extern VscModeControlType VscModeCtl;
 

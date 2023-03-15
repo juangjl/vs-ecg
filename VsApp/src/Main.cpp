@@ -34,8 +34,7 @@ void VarInit(void)
 	{
 		JDataSetInit(&GlobalVar.dataSet[i] );
 	}
-	
-		
+			
 	/// set social security number
 	sprintf((char *)&GlobalVar.strSSN[0], "%s", "000-00-0000");
 		
@@ -56,6 +55,26 @@ void VarInit(void)
 
 	GlobalVar.iFileTimeMSNow = -1;
 	GlobalVar.iVscInfoCnt    = 0;	
+
+	#ifdef FEATURE_JGATT
+  ///------------------------------------------------------///
+  /// share memory
+  ///------------------------------------------------------///  
+	GlobalVar.iShmKey =(JDWORD)time(NULL);	    
+	int shmflg =  IPC_CREAT | 0666;
+	GlobalVar.iShmId 		= shmget(GlobalVar.iShmKey, sizeof(JGattCtlType), shmflg);
+	
+	JGattCtlPtr	= (JGattCtlType *)shmat(GlobalVar.iShmId , NULL, 0);
+	GlobalVar.pid0 = NULL;
+
+	///-------------------------------------------///
+	/// Blue Z Init
+	///-------------------------------------------///
+	if(JGattCtlPtr != NULL)
+	{
+		JGattInit();	
+	}
+#endif ///< for 	FEATURE_JGATT
 }
 
 void MainInit(void)

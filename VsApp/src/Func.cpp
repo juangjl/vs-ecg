@@ -332,6 +332,46 @@ JBOOL FuncSBleSysSsnGet(void)
 	return TRUE;
 }
 
+JBOOL FuncVscModeCreateFolder(JTM jtm)
+{
+	char msg[256];
+	char strFolderName[512];
+
+	sprintf(strFolderName, "%s/VS",	(char *)&GlobalVar.strDataDir[0]);
+	UtilFolderCreate(strFolderName);
+	if(UtilFolderExisted(strFolderName) == FALSE)
+	{
+		DBG_PRINTF("[ERROR] Folder create failed, permisssion denied - 01");		
+	}
+
+	/// Create SNN
+	sprintf(strFolderName, "%s/VS/%s", 
+						(char *)&GlobalVar.strDataDir[0], 
+						(char *)&GlobalVar.strSSN[0]);
+	UtilFolderCreate(strFolderName);
+	if(UtilFolderExisted(strFolderName) == FALSE)
+	{
+		DBG_PRINTF("[ERROR] Folder create failed, permisssion denied - 02");	
+	}
+
+	/// Create YYYY-MM-DD
+	sprintf(strFolderName, "%s/VS/%s/%04d%02d%02d_%02d%02d%02d",
+						(char *)&GlobalVar.strDataDir[0], 
+						(char *)&GlobalVar.strSSN[0], 
+						jtm.iYear, jtm.iMonth, jtm.iDay,
+						jtm.iHour, jtm.iMin, jtm.iSec);
+	UtilFolderCreate(strFolderName);
+	if(UtilFolderExisted(strFolderName) == FALSE)
+	{
+		DBG_PRINTF("[ERROR] Folder create failed, permisssion denied - 02");	
+	}
+	sprintf(msg, "[VSC][INIT] Folder = '%s'\r\n, ", strFolderName);
+	DBG_PRINTF(msg);
+	
+ 	strcpy(GlobalVar.strVscBaseFolder, strFolderName);
+	return TRUE;
+}
+
 JBOOL FuncVscModeInit(void)
 {
 	char strFolderName[256];
@@ -465,6 +505,58 @@ JBOOL FuncVscModeRead(JINT iSecTotal)
 	
 	return TRUE;
 }
+
+#ifdef FEATURE_JGATT
+JBOOL FuncJGattVscModeStart(void)
+{
+	JINT errNo = NO_ERR;	
+	
+	JTM jtm;	
+	time_t t = time(NULL);
+	VscModeControlType *pVscMode = &VscModeCtl;
+	char msg[256];
+	char strFolderName[512];
+	
+	///-------------------------------------------------------------------------///
+	/// Folder Create
+	///-------------------------------------------------------------------------///
+	JTMLocalTimeGet(&jtm, t);
+
+	/// Create VS folder
+	if(GlobalVar.bVscModeSave == TRUE)
+	{
+		FuncVscModeCreateFolder(jtm);
+		sprintf(msg, "[VSC][INIT][GATT] Folder = '%s'\r\n, ", GlobalVar.strVscBaseFolder);
+		DBG_PRINTF(msg);
+	}
+
+	///-------------------------------------------------------------------------///
+	/// Vsc Mode Init
+	///-------------------------------------------------------------------------///
+	VscModeInit(GlobalVar.strVscBaseFolder);		
+
+		
+	///------------------------------------------------------------///
+	/// Data Set Reset
+	///------------------------------------------------------------///
+	GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS0] = 0;
+	GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS1] = 0;
+	GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS2] = 0;
+
+	JDataSetReset(&GlobalVar.dataSet[DATASET_MONITOR_ECG_DS0]);
+	JDataSetReset(&GlobalVar.dataSet[DATASET_MONITOR_ECG_DS1]);
+	JDataSetReset(&GlobalVar.dataSet[DATASET_MONITOR_ECG_DS2]);
+
+
+	///------------------------------------------------------------///
+	/// VSC ATR INIT
+	///------------------------------------------------------------///
+	FuncVscAtrInit();
+			
+	DBG_PRINTF("[TASK][GATT] VSC_MODE START\r\n");			
+	return TRUE;
+}
+#endif ///< for FEATURE_JGATT
 
 JBOOL FuncSRegRead(char *strRegName)
 {

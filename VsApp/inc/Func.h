@@ -36,6 +36,9 @@ extern JBOOL FuncVscModeStart(void);
 extern JBOOL FuncVscModeStop(void);
 extern JBOOL FuncVscModeRead(JINT iSecTotal);
 
+/// GATT MODE
+extern JBOOL FuncJGattVscModeStart(void);
+
 extern JBOOL FuncSRegRead(char *strRegName);
 extern JBOOL FuncSRegWrite(char *strRegName, JBYTE *pbData);
 

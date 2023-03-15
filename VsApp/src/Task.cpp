@@ -106,6 +106,13 @@ void TaskBleControl(void)
 	BleControlAction();
 }
 
+void TaskGattControl(void)
+{	
+#ifdef FEATURE_JGATT
+	JGattControl();
+#endif ///< for	FEATURE_JGATT
+}
+
 void TaskBleState(void)
 {
 	///----------------------------------------------------------------------///
@@ -163,6 +170,8 @@ void MainLoop()
 		TaskBleSReg();
 		
 		TaskBleControl();
+
+		TaskGattControl();
 		
 		TaskBleState();
 		
@@ -180,6 +189,95 @@ void MainLoop()
 ///----------------------------------------------------------------------------------------///
 /// Sub-Task
 ///----------------------------------------------------------------------------------------///
+void SubVscModeGatt(void)
+{
+#ifdef FEATURE_JGATT	
+	char msg[256];
+	
+	JGattCtlType *pJGattCtl = JGattCtlPtr;
+	
+	JDataSet *pDS0 	 = &GlobalVar.dataSet[DATASET_MONITOR_ECG_DS0];
+	JDataSet *pDS1 	 = &GlobalVar.dataSet[DATASET_MONITOR_ECG_DS1];
+
+	JDataSet *pDS2 	 = &GlobalVar.dataSet[DATASET_MONITOR_GSENSOR_X];
+	JDataSet *pDS3 	 = &GlobalVar.dataSet[DATASET_MONITOR_GSENSOR_Y];
+	JDataSet *pDS4 	 = &GlobalVar.dataSet[DATASET_MONITOR_GSENSOR_Z];
+	
+	JINT *pDSTimeMS0 = &GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS0];
+	JINT *pDSTimeMS1 = &GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS1];
+
+	JINT *pDSTimeMS2 = &GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS1];
+	JINT *pDSTimeMS3 = &GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS1];
+	JINT *pDSTimeMS4 = &GlobalVar.iDataSetTime[DATASET_MONITOR_ECG_DS1];
+
+	VscModeControlType *pVscMode = NULL;
+
+	JINT 		i = 0;
+	JFLOAT 	fGSenX[VSC_MODE_GSENSOR_DATA_COUNT];
+	JFLOAT 	fGSenY[VSC_MODE_GSENSOR_DATA_COUNT];
+	JFLOAT 	fGSenZ[VSC_MODE_GSENSOR_DATA_COUNT];
+
+	if(pJGattCtl->bVscModeAdded == FALSE)
+	{
+		return;
+	}
+
+	pJGattCtl->bVscModeAdded = FALSE;
+	while(1)
+	{
+		if(pJGattCtl->iVscModeQueueHead == pJGattCtl->iVscModeQueueTail)
+		{
+			break;
+		}
+		pVscMode = &pJGattCtl->vscModeQueue[pJGattCtl->iVscModeQueueHead];
+		
+		///------------------------------------------------------------------------------------------///
+		///  Save VscMode Data
+		///------------------------------------------------------------------------------------------///
+		if(GlobalVar.bVscModeSave == TRUE)
+		{
+			VscModeSave(pVscMode);		
+		}
+
+		///------------------------------------------------------------------------------------------///
+		///  Chart Data of ECG Set
+		///------------------------------------------------------------------------------------------///
+		JDataSetFIFOAdd(pDS0, (JFLOAT *)&pVscMode->fValueCH[0], VSC_MODE_CHANNEL_DATA_COUNT, 3000);
+		JDataSetFIFOAdd(pDS1, (JFLOAT *)&pVscMode->fValueCH[1], VSC_MODE_CHANNEL_DATA_COUNT, 3000);
+
+		///------------------------------------------------------------------------------------------///
+		///  Chart Data of Gsensor Set
+		///------------------------------------------------------------------------------------------///
+		for(i = 0 ; i < VSC_MODE_GSENSOR_DATA_COUNT; i = i + 1)
+		{
+			fGSenX[i] = (JFLOAT)pVscMode->sGSenX[i] / 100;
+			fGSenY[i] = (JFLOAT)pVscMode->sGSenY[i] / 100;
+			fGSenZ[i] = (JFLOAT)pVscMode->sGSenZ[i] / 100;
+		}
+
+		JDataSetFIFOAdd(pDS2, &fGSenX[0], VSC_MODE_GSENSOR_DATA_COUNT, 150);
+		JDataSetFIFOAdd(pDS3, &fGSenY[0], VSC_MODE_GSENSOR_DATA_COUNT, 150);
+		JDataSetFIFOAdd(pDS4, &fGSenZ[0], VSC_MODE_GSENSOR_DATA_COUNT, 150);
+
+		*pDSTimeMS0 = *pDSTimeMS0 + 200;
+		*pDSTimeMS1 = *pDSTimeMS1 + 200;
+
+		///------------------------------------------------------------------------------------------///
+		///   BLE ECG Data Set
+		///------------------------------------------------------------------------------------------///
+		/// copy CH[0] data
+		//UtilMemcpy((JBYTE *)&GlobalVar.fBleEcgData[0], (JBYTE *)&pVscMode->fValueCH[0], VSC_MODE_CHANNEL_DATA_COUNT * sizeof(JFLOAT));
+		//GlobalVar.iBleEcgDataCnt = VSC_MODE_CHANNEL_DATA_COUNT;
+		//GlobalVar.bBleEcgSet     = TRUE;
+		if((pVscMode->wId % 5) == 0)
+		{
+			UtilMemcpy((JBYTE *)&VscModeCtl, (JBYTE *)pVscMode, sizeof(VscModeControlType));
+		}
+		pJGattCtl->iVscModeQueueHead = (pJGattCtl->iVscModeQueueHead + 1) % VSC_MODE_QUEUE_SIZE;	
+	}
+#endif ///< for FEATURE_JGATT	
+}
+
 void SubBleVscMode(void)
 {
 	char msg[256];
@@ -235,8 +333,8 @@ void SubBleVscMode(void)
 		///------------------------------------------------------------------------------------------///
 		///  Chart Data of ECG Set
 		///------------------------------------------------------------------------------------------///
-		JDataSetFIFOAdd(pDS0, (JFLOAT *)&pVscMode->fValueCH[0], VSC_MODE_CAHNNEL_DATA_COUNT, 3000);
-		JDataSetFIFOAdd(pDS1, (JFLOAT *)&pVscMode->fValueCH[1], VSC_MODE_CAHNNEL_DATA_COUNT, 3000);
+		JDataSetFIFOAdd(pDS0, (JFLOAT *)&pVscMode->fValueCH[0], VSC_MODE_CHANNEL_DATA_COUNT, 3000);
+		JDataSetFIFOAdd(pDS1, (JFLOAT *)&pVscMode->fValueCH[1], VSC_MODE_CHANNEL_DATA_COUNT, 3000);
 
 		///------------------------------------------------------------------------------------------///
 		///  Chart Data of Gsensor Set
@@ -360,6 +458,8 @@ void SubLoop(void)
 	while(1)
 	{		
 		SubBleVscMode();
+
+		SubVscModeGatt();
 
 		SubBleVscAtr();
 

@@ -181,6 +181,8 @@
 #define CMD_BLE_VSC_MODE_CLEAR									(0x69)  
 #define CMD_BLE_VSC_MODE_READ										(0x6A)  
 
+#define CMD_BLE_VSC_MODE_TYPE_SET				      	(0x70)
+
 #define CMD_BLE_TEST														(0xF0) 
 
 ///---------------------------------------------------------------///

@@ -37,6 +37,7 @@ extern JView 	JVForm3;
 extern JView 	JVForm4;
 extern JView 	JVForm5;
 extern JView 	JVForm6;
+extern JView 	JVForm7;
 
 extern JView 	JVFormX;
 

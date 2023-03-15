@@ -26,6 +26,8 @@ ConfigItemType ConfigItem[] =
 		{CONFIG_ITEM_BLE_DEVICE_NAME, 	"", 											JCONFIG_TYPE_STR},							
 		{CONFIG_ITEM_BLE_DEVICE_MAC,  	"", 											JCONFIG_TYPE_STR},			
 	  {CONFIG_ITEM_VSC_MODE_SAVE, 	 	"ON", 										JCONFIG_TYPE_STR},	
+		{CONFIG_ITEM_GATT_DEVICE_NAME, 	   "", 										JCONFIG_TYPE_STR},							
+		{CONFIG_ITEM_GATT_DEVICE_MAC,  	   "", 										JCONFIG_TYPE_STR},
 		///------------------------------------------------------------------------------------///
 		{"", "", JCONFIG_TYPE_STR},			
 };
