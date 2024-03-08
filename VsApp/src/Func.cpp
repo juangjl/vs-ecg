@@ -431,6 +431,16 @@ JBOOL FuncVscModeStart(void)
 	JINT iErrNo = NO_ERR;
 	char msg[256];	
 
+
+	iErrNo = CmdSBleVscModeTypeGet();
+	if(iErrNo != NO_ERR)
+	{			
+		sprintf(msg, "[ERROR] VSC Mode type get failed\r\n");
+		DBG_PRINTF(msg);		
+		return  FALSE;
+	}		
+
+
 	/// VSH101 VSC MODE Start
 	iErrNo = CmdSBleVscModeStart();
 	if(iErrNo != NO_ERR)

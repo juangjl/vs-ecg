@@ -13,6 +13,7 @@ SRC=./src
 OUT=./out
 
 OS_NAME := $(shell uname -s)
+
 #-----------------------------#
 # OS TYPE
 # WINDOWS : 0
@@ -35,6 +36,7 @@ ifeq ($(OS_NAME), Linux)
 endif
 
 ifeq ($(OS_NAME), Darwin)
+	CFLAGS_OS= -Wno-deprecated-declarations
 	OS_TYPE=OS_TYPE_MAC_OS
 endif
 

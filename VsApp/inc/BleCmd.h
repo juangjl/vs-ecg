@@ -52,6 +52,8 @@ extern JINT CmdSBleVscModeRead(void);
 
 extern JINT CmdSBleMonitorMode(JINT *piMonitorMode);
 
+extern JINT CmdSBleVscModeTypeGet(void);
+
 extern JINT CmdSBleSRegRead(SRegType *pSReg);
 extern JINT CmdSBleSRegWrite(SRegType *pSReg);
 

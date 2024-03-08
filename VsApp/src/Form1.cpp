@@ -430,10 +430,17 @@ gboolean CallbackForm1DrawArea0 (GtkWidget *widget, cairo_t *cr, gpointer data)
 		fTimeSec   = -1;
 	}	
 				
+	if(GlobalVar.bChartLoadEcgDS0Draw == TRUE)
+	{
+		return FALSE;
+	}
+
 	iWidth  = gtk_widget_get_allocated_width(widget);
 	iHeight = gtk_widget_get_allocated_height(widget);
 	
 	pDC  = new JDraw(cr); 
+	
+	GlobalVar.bChartLoadEcgDS0Draw  = TRUE;
 	
 	iTimeMS = GlobalVar.iFileTimeMSNow;
 	if(iTimeMSPre != iTimeMS)

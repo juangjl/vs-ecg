@@ -52,7 +52,6 @@ void VarInit(void)
 	///-------------------------------------------///
 	SRegInit();
 	
-
 	GlobalVar.iFileTimeMSNow = -1;
 	GlobalVar.iVscInfoCnt    = 0;	
 

@@ -14,6 +14,16 @@
 #define VSC_MODE_TYPE0															(0x00)
 #define VSC_MODE_TYPE1															(0x01)
 
+#define VSC_MODE_TYPE0_DATA_SIZE		 								(800) ///< 2 channel 200 ms
+
+#define VSC_MODE_TYPE1_DATA_SIZE		 								(400) ///< 1 channel 200 ms
+
+///----------------------------------------------------------------///
+/// VSC_MODE INFO TYPE
+///----------------------------------------------------------------//
+#define VSC_MODE_INFO_TYPE0												 	(0)
+#define VSC_MODE_INFO_TYPE1												 	(1)
+
 #define VSC_MODE_INFO_TYPE													(0)
 
 #define VSC_MODE_INFO_TYPE0_TIME_UTC								(1)
@@ -48,6 +58,11 @@
 #define VSC_MODE_INFO_TYPE0_ATR				              (27) ///< ATR CODE
 #define VSC_MODE_INFO_TYPE0_ATR_TIME	              (28) ///< ATR TIME
 
+
+#define VSC_MODE_INFO_TYPE0_VSC_START_UTC           (29) ///< Start time in seconds since 1970
+#define VSC_MODE_INFO_TYPE0_VSC_RUN_TIME            (30) ///< Run time in seconds
+
+#define VSC_MODE_INFO_TYPE0_GSEN_POWER              (31) ///< G-Sensor power
 
 
 #define VSC_MODE_IDX_INVALID				 (8000)
@@ -122,6 +137,8 @@ typedef struct VscModeControlSt
 	JSHORT  sGSenZ[5];			///< 19~26 : 
 
 	JAtrType atrNow;				///< 27 :	
+
+	JDWORD dwVscModeType;   ///< VSC Mode Type setting    
 } VscModeControlType;
 
 #define VSC_MODE_QUEUE_SIZE             (60)
@@ -131,6 +148,7 @@ extern VscModeControlType VscModeCtl;
 extern void VscModeFileNameSet(VscModeControlType *pVscMode);
 extern void VscModeSave(VscModeControlType *pVscMode);
 extern void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData);
+extern void VscModeType1Decode(JWORD wId, JWORD wLen, JBYTE *pbData);
 extern void VscModeInit(char *pBaseFolder);
 
 extern void VscModeAtrBinSave(void);

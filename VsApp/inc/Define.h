@@ -16,8 +16,8 @@
 ///-----------------------------------------------------------------------///
 #define VS_SERIAL_NO					"000 - 00000"
 
-#define VS_MODEL_NAME					"VS-ECG"
-#define VS_VERSION_STR			 	"V1.00"
+#define VS_MODEL_NAME					"VS-APP"
+#define VS_VERSION_STR			 	"V1.14"
 
 #define VS_MID							 	(0x45110164)
 #define VS_PID							 	(0x00000100)

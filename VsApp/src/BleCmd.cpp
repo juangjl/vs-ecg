@@ -454,6 +454,68 @@ JINT CmdSBleSysSsnGet(char *pStrSsn)
   return iErrNo;
 }
 
+JINT CmdSBleVscModeTypeSet(void)
+{
+  JINT iErrNo = NO_ERR;
+
+  PacketType    PacketOut;
+  PacketAckType PacketIn;
+  
+  JINT 	  iTimeout = 3500;
+  JDWORD  dwVscModeType = VSC_MODE_TYPE0;
+
+  PacketInit(&PacketOut);
+  
+  /// output packet set
+  PacketOut.bGroupId 	= CMD_GROUP_ID_BLE;
+  PacketOut.bCmd 			= CMD_BLE_VSC_MODE_TYPE_SET;
+  PacketOut.bPCode 		= CMD_BLE_VSC_MODE_TYPE_SET;
+  PacketOut.wMOSILen 	= 20;
+  PacketOut.wMISOLen 	= 0;
+
+  UtilMemcpy((JBYTE *)&PacketOut.bCmdData[0], (JBYTE *)&dwVscModeType, 4);
+  
+  /// slave packet Cmd
+	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
+
+	if(PacketIn.bAck != 'A')
+  {
+    printf("[ERROR] VSC_MODE_MODE_SET NACK\r\n");
+    iErrNo = ERR_WRONG_ARG_FORMAT;
+  }
+	
+  return iErrNo;
+}
+
+JINT CmdSBleVscModeTypeGet(void)
+{
+  
+  JINT iErrNo = NO_ERR;
+	char strName[32];
+	SRegType *pSReg = &GlobalVar.SReg;
+
+  // get the vsc mode type
+	UtilMemset((JBYTE *)&pSReg->strName[0], 0x00, SREG_NAME_SIZE);
+	strcpy(pSReg->strName, SREG_VSC_MODE_TYPE);
+
+  iErrNo = CmdSBleSRegRead(pSReg);
+	if(iErrNo != NO_ERR)
+	{					
+		return  iErrNo;
+	}	
+
+  UtilMemcpy((JBYTE *)&VscModeCtl.dwVscModeType ,  (JBYTE *) &pSReg->bData[0], SREG_DATA_MEAS_VSC_MODE_TYPE_SIZE);       
+  if(VscModeCtl.dwVscModeType == VSC_MODE_TYPE0)
+	{
+  	VscModeCtl.iChannelCount = VSC_MODE_CAHNNEL_COUNT;
+	}
+	else
+	{
+  	VscModeCtl.iChannelCount = 1;
+	}
+  return iErrNo;
+}
+
 JINT CmdSBleVscModeStart(void)
 {
   JINT iErrNo = NO_ERR;
@@ -516,7 +578,7 @@ JINT CmdSBleVscModeRead(void)
 	char 	msg[256];
   JINT iErrNo = NO_ERR;
   JWORD wId = 0;
-  JWORD wLen = 0;
+  JWORD wLen = 968;
    
   PacketType    PacketOut;
   PacketAckType PacketIn;
@@ -528,14 +590,23 @@ JINT CmdSBleVscModeRead(void)
 
   PacketInit(&PacketOut);
   
+  pVscMode = &VscModeCtl;
+
+  if(pVscMode->dwVscModeType == VSC_MODE_TYPE1)
+  {
+    wLen = 568;
+  }
+  
   /// output packet set
   PacketOut.bGroupId 	= CMD_GROUP_ID_BLE;
   PacketOut.bCmd 			= CMD_BLE_VSC_MODE_READ;
   PacketOut.bPCode 		= CMD_BLE_VSC_MODE_READ;
-  PacketOut.wMOSILen 	= 2;
-  PacketOut.wMISOLen 	= 968;
+  PacketOut.wMOSILen 	= 8;
+  PacketOut.wMISOLen 	= wLen;
   
   *(JWORD *)&PacketOut.bData[0] = VscModeCtl.wId;
+
+  *(JDWORD *)&PacketOut.bData[4] = pVscMode->dwVscModeType;
 
   /// slave packet Cmd
 	iErrNo = SBlePacketSend(&PacketOut, &PacketIn, iTimeout);
@@ -563,8 +634,16 @@ JINT CmdSBleVscModeRead(void)
 	wId  = PacketIn.wDataIdx;
 	wLen = PacketIn.wDataLen;
 	
-	VscModeDecode(wId, wLen, (JBYTE *)&PacketIn.bData[0]);
-  
+  if(pVscMode->dwVscModeType == VSC_MODE_TYPE1)
+  {
+
+  	VscModeType1Decode(wId, wLen, (JBYTE *)&PacketIn.bData[0]);
+  }
+  else
+  {
+  	VscModeDecode(wId, wLen, (JBYTE *)&PacketIn.bData[0]);
+  }
+
   /// copy to main
   pVscMode = &GlobalVar.vscModeQueue[GlobalVar.iVscModeQueueTail];
   UtilMemcpy((JBYTE *)pVscMode, (JBYTE *)&VscModeCtl, sizeof(VscModeControlType));

@@ -632,6 +632,45 @@ void VscModeDecode(JWORD wId, JWORD wLen, JBYTE *pbData)
 	//DBG_PRINTF(msg);
 }
 
+void VscModeType1Decode(JWORD wId, JWORD wLen, JBYTE *pbData)
+{
+	char msg[256];
+
+	JINT iCH = 0;
+	JINT iCnt = 0;
+	JFLOAT *pfData = NULL;
+	JINT 		i = 0;
+	JINT 		j = 0;
+	JINT		idx = 0;
+	
+	VscModeControlType *pVscMode = &VscModeCtl;
+	VscModeItemType *pItem = &pVscMode->item;	
+
+	pItem->wId = wId;
+	pItem->wLen= wLen;
+
+	/// Ecg Data Copy
+	UtilMemcpy((JBYTE *)&pItem->bData[0], (JBYTE *)&pbData[0], VSC_MODE_TYPE1_DATA_SIZE);
+
+	/// Info Data Copy
+	UtilMemcpy((JBYTE *)&pItem->fInfo[0], (JBYTE *)&pbData[VSC_MODE_TYPE1_DATA_SIZE], VSC_MODE_ITEM_INFO_SIZE);
+
+	/// Info Data Parse
+	VscModeInfoParse(pVscMode);
+	
+ 	iCnt = (VSC_MODE_TYPE1_DATA_SIZE / sizeof(JFLOAT) ) ;
+	/// Ecg Data Parse
+	pfData =(JFLOAT *) &pItem->bData[0];
+	for(i = 0 ; i < iCnt; i = i + 1)
+	{
+		pVscMode->fValueCH[iCH][i] = pfData[idx];			
+		idx = idx + 1;
+	}
+	
+	//sprintf(msg, "\t\t [VSC]  ID = %03d, SIZE=%d, IDX = %d\r\n", pItem->wId , pItem->wLen, idx);
+	//DBG_PRINTF(msg);
+}
+
 void VscModeInit(char *pBaseFolder)	
 {	
 	JTM jtm;

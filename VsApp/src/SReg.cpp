@@ -154,6 +154,30 @@ JBOOL SRegActMeasLeadOff(SRegType *pSReg, JBYTE bAction)
   return TRUE;
 }
 
+JBOOL SRegActVscModeType(SRegType *pSReg, JBYTE bAction)
+{
+  char msg[256];
+  if(bAction == SREG_ACT_WRITE)
+  {    
+    ///----------------------------------------------------------------------------------------------///
+    /// SREG_WRITE 
+    ///----------------------------------------------------------------------------------------------///
+    sprintf(msg, "[SREG][WRITE] %s\r\n", pSReg->strName);
+    DBG_PRINTF(msg);
+  }
+  else if(bAction == SREG_ACT_READ)
+  {  
+    UtilMemcpy((JBYTE *)&SRegApp.MEAS_VSC_MODE_TYPE[0],  (JBYTE *) &pSReg->bData[0], SREG_DATA_MEAS_VSC_MODE_TYPE_SIZE);       
+    ///----------------------------------------------------------------------------------------------///
+    /// SREG_READ
+    ///----------------------------------------------------------------------------------------------///
+    sprintf(msg, "\t [SREG][READ] %s :%d\r\n", pSReg->strName, SRegApp.MEAS_VSC_MODE_TYPE[0]);
+    DBG_PRINTF(msg);
+  }      
+  return TRUE;
+}
+
+
 JBOOL SRegActMeasLeadOffCompThreshold(SRegType *pSReg, JBYTE bAction)
 {
   char msg[256];
@@ -264,6 +288,7 @@ void SRegInit(void)
   SRegApp.MEAS_LEAD_OFF[0]        = 0xFF;
   SRegApp.MEAS_LEAD_OFF_CURR[0]   = 0xFF; 
   SRegApp.MEAS_MOTION_MODE[0]     = 0xFF;
+  SRegApp.MEAS_VSC_MODE_TYPE[0]   = 0xFF;
 }
 
 ///---------------------------------------------------------------------------------------------------------------///
@@ -281,6 +306,7 @@ SRegActType SRegActArr[] =
   SREG_MEAS_LEAD_OFF_CURR,     SRegActMeasLeadOffCurrLevel,  
   SREG_MEAS_LEAD_OFF,          SRegActMeasLeadOff,  
   SREG_MEAS_MOTION_MODE,       SRegActMeasMotionMode,  
+  SREG_VSC_MODE_TYPE,          SRegActVscModeType,
   "",                          SRegActDefault
 };
 

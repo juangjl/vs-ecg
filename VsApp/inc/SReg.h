@@ -22,6 +22,7 @@
 #define SREG_MEAS_LEAD_OFF_COMP_TH  "SREG_MEAS_LEAD_OFF_COMP_TH"
 #define SREG_MEAS_LEAD_OFF_CURR     "SREG_MEAS_LEAD_OFF_CURR"
 #define SREG_MEAS_MOTION_MODE       "SREG_MEAS_MOTION_MODE"
+#define SREG_VSC_MODE_TYPE          "SREG_VSC_MODE_TYPE"
 
 ///---------------------------------------------------------------------------------------------------------------///
 ///
@@ -66,6 +67,7 @@ typedef struct SRegActSt
 #define SREG_DATA_MEAS_LEAD_COMP_TH_SIZE    (4)
 #define SREG_DATA_MEAS_LEAD_OFF_CURR_SIZE   (1)
 #define SREG_DATA_MEAS_MOTION_ACTIVATE_SIZE (1)
+#define SREG_DATA_MEAS_VSC_MODE_TYPE_SIZE   (4)
 
 typedef struct SRegAppSt
 {
@@ -76,6 +78,7 @@ typedef struct SRegAppSt
   JBYTE MEAS_LEAD_OFF_COMP_TH[SREG_DATA_MEAS_LEAD_COMP_TH_SIZE];  
   JBYTE MEAS_LEAD_OFF_CURR[SREG_DATA_MEAS_LEAD_OFF_CURR_SIZE];
   JBYTE MEAS_MOTION_MODE[SREG_DATA_MEAS_MOTION_ACTIVATE_SIZE];
+  JBYTE MEAS_VSC_MODE_TYPE[SREG_DATA_MEAS_VSC_MODE_TYPE_SIZE];
 } SRegAppType;
 
 #pragma pack(pop)
